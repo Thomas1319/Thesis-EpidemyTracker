@@ -1,0 +1,63 @@
+﻿@model Patient
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutLoggedin.cshtml";
+    var modelSave = Model;
+}
+
+<!--Patient data section-->
+<div class="card">
+    <h2 class="card-title">@Model.firstName @Model.lastName</h2>
+    <div class="card-body">
+        <div class="card-group">
+            <ul class="list-group">
+                <li class="list-group-item"><h6>Address:</h6> @Model.address</li>
+                <li class="list-group-item"><h6>Phone Number:</h6> @Model.phoneNumber</li>
+                <li class="list-group-item"><h6>Email:</h6> @Model.emailAddress</li>
+            </ul>
+        </div>
+
+        <div class="card-group">
+            <ul class="list-group">
+                <li class="list-group-item"><h6>Gender:</h6> @Model.gender</li>
+                <li class="list-group-item"><h6>Age:</h6> @Model.age</li>
+                <li class="list-group-item"><h6>Height:</h6> @Model.height</li>
+                <li class="list-group-item"><h6>Weight:</h6> @Model.weight</li>
+                <li class="list-group-item"><h6>Date when synptoms appeared:</h6> @Model.symptomsDate</li>
+                <li class="list-group-item"><h6>Symptoms:</h6> @Model.symptoms</li>
+            </ul>
+        </div>
+
+        <div class="card-group">
+            <p class="list-group-item">@Model.additionalComments</p>
+        </div>
+    </div>
+    
+
+</div>
+<!--Treatment section-->
+<div>
+    <form asp-action="ProcessPatient">
+        <input type="hidden" asp-for="@Model.ID" value="@modelSave.ID" />
+
+        <div class="form-group mt-2">
+            <input class="form-check" asp-for="@Model.treatment" type="radio" name="treatment" required="true" value="See a general practitioner" id="treatment1" />
+            <label class="form-check-label" for="treatment1">See a general practitioner</label>
+            <input class="form-check" type="radio" name="treatment" value="House quaratine" id="treatment2" />
+            <label class="form-check-label" for="treatment1">House quaratine</label>
+            <input class="form-check" type="radio" name="treatment" value="Hospitalize" id="treatment3" />
+            <label class="form-check-label" for="treatment1">Hospitalize</label>
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" asp-for="@Model.treatmentComments" id="message" name="treatmentComments" placeholder="Give details about the treatment..." required="true"></textarea>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="Submit" />
+            <input class="btn btn-danger" type="button" value="Cancel" onclick="@("window.location.href='" + @Url.Action("Index", "Dashboard") + "'");" />
+
+        </div>
+    </form>
+    
+</div>
+
+

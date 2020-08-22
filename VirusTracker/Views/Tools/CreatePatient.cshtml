@@ -1,0 +1,130 @@
+﻿@model VirusTracker.Models.Patient
+
+@{
+    ViewData["Title"] = "CreatePatient";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card">
+    <div class="card-title"><h3>Create Patient</h3></div>
+    <div class="card-body">
+        <form asp-action="CreatePat" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="firstName" class="control-label"></label>
+                <input asp-for="firstName" class="form-control" />
+                <span asp-validation-for="firstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="lastName" class="control-label"></label>
+                <input asp-for="lastName" class="form-control" />
+                <span asp-validation-for="lastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="address" class="control-label"></label>
+                <input asp-for="address" class="form-control" />
+                <span asp-validation-for="address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="phoneNumber" class="control-label"></label>
+                <input asp-for="phoneNumber" class="form-control" />
+                <span asp-validation-for="phoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="emailAddress" class="control-label"></label>
+                <input asp-for="emailAddress" class="form-control" />
+                <span asp-validation-for="emailAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="age" class="control-label"></label>
+                <input asp-for="age" class="form-control" />
+                <span asp-validation-for="age" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="gender" class="control-label"></label>
+                <input asp-for="gender" class="form-control" />
+                <span asp-validation-for="gender" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="weight" class="control-label"></label>
+                <input asp-for="weight" class="form-control" />
+                <span asp-validation-for="weight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="height" class="control-label"></label>
+                <input asp-for="height" class="form-control" />
+                <span asp-validation-for="height" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="symptomsDate" class="control-label"></label>
+                <input asp-for="symptomsDate" class="form-control" />
+                <span asp-validation-for="symptomsDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="fever" name="symptom" value="Fever">
+                    <label class="custom-control-label" for="fever">Fever</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="dry cough" name="symptom" value="Dry cough">
+                    <label class="custom-control-label" for="dry cough">Dry cough</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="tiredness" name="symptom" value="Tiredness">
+                    <label class="custom-control-label" for="tiredness">Tiredness</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="aches and pains" name="symptom" value="Aches and pains">
+                    <label class="custom-control-label" for="aches and pains">Aches and pains</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="sore throat" name="symptom" value="Sore throat">
+                    <label class="custom-control-label" for="sore throat">Sore throat</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="diarrhoea" name="symptom" value="Diarrhoea">
+                    <label class="custom-control-label" for="diarrhoea">Diarrhoea</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="conjunctivitis" name="symptom" value="Conjunctivitis">
+                    <label class="custom-control-label" for="conjunctivitis">Conjunctivitis</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="headache" name="symptom" value="Headache">
+                    <label class="custom-control-label" for="headache">Headache</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="loss of taste or smell" name="symptom" value="Loss of taste or smell">
+                    <label class="custom-control-label" for="loss of taste or smell">Loss of taste or smell</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="a rash on skin" name="symptom" value="A rash on skin">
+                    <label class="custom-control-label" for="a rash on skin">A rash on skin</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="discolouration of fingers or toes" name="symptom" value="Discolouration of fingers or toes">
+                    <label class="custom-control-label" for="discolouration of fingers or toes">Discolouration of fingers or toes</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="difficulty breathing" name="symptom" value="Difficulty breathing">
+                    <label class="custom-control-label" for="difficulty breathing">Difficulty breathing</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="chest pain or pressure" name="symptom" value="Chest pain or pressure">
+                    <label class="custom-control-label" for="chest pain or pressure">Chest pain or pressure</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="loss of speech or movement" name="symptom" value="Loss of speech or movement">
+                    <label class="custom-control-label" for="loss of speech or movement">Loss of speech or movement</label>
+                </div>
+                <input type="hidden" asp-for="symptoms" value="placeholder" />
+                <span asp-validation-for="symptoms" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+

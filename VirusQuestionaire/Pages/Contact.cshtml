@@ -1,0 +1,68 @@
+﻿@page
+@model VirusQuestionaire.Pages.ContactModel
+
+@{
+    ViewData["Title"] = "Contact";
+}
+    <body>
+        <h2>Contact</h2>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Message.timestamp" value="@DateTime.UtcNow" />
+                    <input type="hidden" asp-for="Message.type" value="external" />
+                    <div class="form-group">
+                        <label asp-for="Message.Name" class="control-label">Full Name</label>
+                        <input asp-for="Message.Name" class="form-control" />
+                        <span asp-validation-for="Message.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Message.Email" class="control-label">Email address</label>
+                        <input asp-for="Message.Email" class="form-control" />
+                        <span asp-validation-for="Message.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Message.subject" class="control-label">Subject</label>
+                        <input asp-for="Message.subject" class="form-control" />
+                        <span asp-validation-for="Message.subject" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Message.messageContent" class="control-label">Message</label>
+                        <textarea asp-for="Message.messageContent" class="form-control"></textarea>
+                        <span asp-validation-for="Message.messageContent" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Send" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <form>
+                    <legend>Our office</legend>
+                    <address>
+                        <strong>Virus Questionaire, I.N.C</strong><br>
+                        795 Folsom Ave, Suite 600<br>
+                        San Francisco, CA 94107<br>
+                        <abbr title="Phone">
+                            P:
+                        </abbr>
+                        (123) 456-7890
+                    </address>
+                    <address>
+                        <strong>Contact Person</strong><br>
+                        <a href="mailto:#">contact.person@example.com</a>
+                    </address>
+                </form>
+            </div>
+        </div>
+    </body>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

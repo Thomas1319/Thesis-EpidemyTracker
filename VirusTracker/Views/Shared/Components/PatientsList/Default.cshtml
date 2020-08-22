@@ -1,0 +1,34 @@
+﻿@model List<Patient>
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+    
+        <header>
+            <a class="navbar-brand">My Patients</a>
+        </header>
+        <ul class="list-group">
+            @foreach(var p in Model)
+            {
+            <li class="list-group-item">
+                <a href="@Url.Action("Index", "HandlePatient", new { id = p.ID })">@p.firstName @p.lastName</a>
+                @if (!p.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00") && DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
+                {
+                    //System.Diagnostics.Debug.WriteLine(DateTime.Compare(p.quarantineEndDate, DateTime.Now));
+                    <p style="color:red">@p.quarantineEndDate</p>
+                }
+                else
+                {
+                    @if (p.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00"))
+                    {
+                        <p style="color:forestgreen">No quarantine</p>
+                    }
+                    else
+                    {
+                        <p style="color:forestgreen">@p.quarantineEndDate</p>
+                    }
+
+                }
+
+            </li>
+            }   
+        </ul>

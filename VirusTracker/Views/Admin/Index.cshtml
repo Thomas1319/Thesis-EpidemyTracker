@@ -1,0 +1,46 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    List< Patient > patients = Model.Patients;
+}
+    <h3>Doctors</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Code</th>
+                <th>Number of Patients</th>
+                <th>Sick</th>
+                <th>Healthy</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @{
+                foreach (Doctor d in Model.Doctors)
+                {
+                    int nbOfPatients = patients.Count(p => p.doctorId == d.Id);
+                    int sick= patients.Count(p => (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0) && p.doctorId == d.Id);
+                    int healthy = nbOfPatients - sick;
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => d.firstName)</td>
+                            <td>@Html.DisplayFor(modelItem => d.lastName)</td>
+                            <td>ABC123</td>
+                            <td>@nbOfPatients</td>
+                            <td class="text-danger">@sick</td>
+                            <td class="text-success">@healthy</td>
+                            <td>
+                                <input class="btn btn-info" type="button" title="Edit" value="edit" onclick="location.href='@Url.Action("EditDoctor", new { doctorId = d.Id })'" />
+                            </td>
+                            <td>
+                                <input class="btn btn-danger" type="button" title="Remove" value="Remove" onclick="location.href='@Url.Action("RemoveDoctor", new { doctorId = d.Id })'" />
+                            </td>
+                        </tr>
+                
+            }
+            }
+            </tbody>
+        </table>
+

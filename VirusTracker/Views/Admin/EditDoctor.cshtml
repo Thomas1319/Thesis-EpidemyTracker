@@ -1,0 +1,82 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "EditDoctor";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+    <div>
+        <div class="card mt-3 mb-3">
+            <h2 class="card-title"> Dr.@Model.Doctor.firstName @Model.Doctor.lastName</h2>
+
+            <div class="card-body">
+                <form asp-action="SaveChangesDoctor" method="post">
+                    <input type="hidden" name="id" value="@Model.Doctor.Id" />
+                    <div class="form-group">
+                        <label for="fname">First Name:</label>
+                        <input type="text" id="fname" name="fname" value="@Model.Doctor.firstName" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="lname">Last Name:</label>
+                        <input type="text" id="lname" name="lname" value="@Model.Doctor.lastName" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" value="@Model.Doctor.UserName" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="text" id="password" name="password" value="@Model.Doctor.password" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="text" id="email" name="email" value="@Model.Doctor.Email" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number:</label>
+                        <input type="text" id="phone" name="phone" value="@Model.Doctor.PhoneNumber" class="form-control" required />
+                    </div>
+                    <input class="btn btn-info" type="submit" title="Edit" value="edit" />
+                </form>
+            </div>
+
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>First name</td>
+                    <td>Last name</td>
+                    <td>Status</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(Patient p in Model.Patients)
+                {
+                <tr>
+                    <td>@p.firstName</td>
+                    <td>@p.lastName</td>
+                    @if (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
+                    {
+                        <td class="text-danger">Sick</td>
+                    }
+                    else
+                    {
+                        <td class="text-success">Healthy</td>
+                    }
+                    <td>
+                        <input class="btn btn-info" type="button" title="View" value="view" onclick="location.href='@Url.Action("EditPatient", new { patientId = p.ID })'" />
+                    </td>
+                    <td>
+                        <input class="btn btn-danger" type="button" title="Remove" value="remove" onclick="location.href='@Url.Action("RemoveFromDoctor", new { patientId = p.ID, docId = Model.Doctor.Id })'" />
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+
+        
+
+
+    </div>
+

@@ -1,0 +1,365 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutLoggedin.cshtml";
+    var modelSave = Model.Patient;
+    var searchCheck = TempData.Peek("searchCheck");
+}
+    <script>
+    //scroll to the DIV the reloaded the page TO DO
+    window.onload = function () {
+        var obj = document.getElementById("scrollable");
+        obj.scrollTop = obj.scrollHeight;
+    }
+
+    function switchTab(tabId, nextTab) {
+        var x = document.getElementById("tab-" + tabId);
+        var y = document.getElementById("tab-" + nextTab);
+        x.style.display = "none";
+        y.style.display = "block";
+    }
+    function createSymptom(index) {
+        var s = document.createElement("input");
+        s.setAttribute("type", "text");
+        s.setAttribute("class", "form-control");
+        s.setAttribute("name", "currSymptom " + index);
+        s.style.width = "40%";
+        s.required = true;
+
+        var i = document.createElement("i");
+        i.setAttribute("class", "material-icons");
+        i.innerHTML = "keyboard_arrow_right";
+
+        var s2 = document.createElement("input");
+        s2.setAttribute("type", "text");
+        s2.setAttribute("class", "form-control");
+        s2.setAttribute("name", "currComment " + index);
+        s2.style.width = "40%";
+        s2.value = "";
+
+        var btn = document.createElement("button");
+        btn.setAttribute("type", "button");
+        btn.setAttribute("id", "symptom " + index);
+        btn.setAttribute("class", "text-danger btn");
+        btn.setAttribute("onclick", "removeSymptom(" + index + "); toggleCreate()");
+
+        var i2 = document.createElement("i");
+        i2.setAttribute("class", "material-icons");
+        i2.innerHTML = "remove";
+
+        btn.appendChild(i2);
+
+        var div = document.createElement("div");
+        div.setAttribute("class", "col-4 form-inline");
+        div.setAttribute("id", "symptom " + index);
+        div.appendChild(s);
+        div.appendChild(i);
+        div.appendChild(s2);
+        div.appendChild(btn);
+        
+        document.getElementById("symptomsContainer").appendChild(div);
+        }
+
+    function removeSymptom(index) {
+        var par = document.getElementById("symptomsContainer")
+        var x = document.getElementById("symptom " + index);
+        par.removeChild(x);
+        }
+        function toggleCreate() {
+            var x = document.getElementById("extra");
+            if (x.style.display === "none")
+                x.style.display = "block";
+            else
+                x.style.display = "none";
+        }
+    </script>
+<!--Patient data section-->
+<div>
+    <div class="card mt-3 mb-3">
+        <h2 class="card-title">@Model.Patient.firstName @Model.Patient.lastName</h2>
+
+        <div class="card-body">
+            <ul class="list-group">
+                <li class="list-group-item"><h6>Address:</h6> @Model.Patient.address</li>
+                <li class="list-group-item"><h6>Phone Number:</h6> @Model.Patient.phoneNumber</li>
+                <li class="list-group-item"><h6>Email:</h6> @Model.Patient.emailAddress</li>
+            </ul>
+        </div>
+    </div>
+    
+
+    <div class="card mt-3 mb-3">
+        <h2 class="card-title">Medical Info</h2>
+        <div class="card-body">
+            <ul class="list-group">
+                <li class="list-group-item"><h6>Gender:</h6> @Model.Patient.gender</li>
+                <li class="list-group-item"><h6>Age:</h6> @Model.Patient.age</li>
+                <li class="list-group-item"><h6>Height:</h6> @Model.Patient.height</li>
+                <li class="list-group-item"><h6>Weight:</h6> @Model.Patient.weight</li>
+
+            </ul>
+            <h2 class="card-title">Additional comments</h2>
+
+            <p class="card-text">@Model.Patient.additionalComments</p>
+        </div>
+        <ul class="list-inline">
+            @for(int i = 0; i < Model.Documents; i++)
+            {
+                <li class="list-inline-item">
+                    <a href="@Url.Action("GetDocument", "HandlePatient", new{number = i, id = Model.Patient.ID})"><i class="material-icons">description</i></a>
+                </li>
+            }
+            
+        </ul>
+    </div>
+
+    <div class="card mt-3 mb-3">
+        <h2 class="card-title">Treatment info</h2>
+        <div class="card-body">
+
+            @if (Model.Updates == null)
+            {
+                <form asp-action="CreateUpdate" method="post">
+                    <input type="hidden" name="patientId" value="@Model.Patient.ID" />
+                    <input type="hidden" name="timestamp" id="timestamp" value="@DateTime.UtcNow" />
+                    <div class="form-group">
+                        <label for="fname">Treatment:</label>
+                        <input type="text" id="currTreatment" name="currTreatment" value="@Model.Patient.treatment" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="fname">Treatment Comments:</label>
+                        <input type="text" id="currTreatComm" name="currTreatComm" value="@Model.Patient.treatmentComments" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="fname">Current Symptoms:</label>
+                        @{
+                            var splitSymptoms = Model.Patient.symptoms.Trim().Split(",");
+                            int i = 0;
+                            <input type="hidden" name="nbSymp" id="nbSymp" value="@splitSymptoms.Length" />
+                            <div class="row" id="symptomsContainer">
+                                @for (i = 0; i < splitSymptoms.Length; i++)
+                                {
+                                    var split = splitSymptoms[i].Split(":");
+                                    <div class="col-4" id="symptom @i">
+                                        <div class="form-inline">
+                                            <input type="text" id="currSymptom @i" name="currSymptom @i" value="@split[0]" class="form-control" style="width:40%" required />
+                                            <i class="material-icons">keyboard_arrow_right</i>
+                                            @if (split.Length > 1)
+                                            {
+                                                <input type="text" id="currComment @i" name="currComment @i" value="@splitSymptoms[i].Split(":")[1]" class="form-control" style="width:40%" />
+                                            }
+                                            else
+                                            {
+                                                <input type="text" id="currComment @i" name="currComment @i" value="" class="form-control" style="width:40%" />
+                                            }
+                                            <button type="button" class="text-danger btn" onclick="removeSymptom(@i)"><i class="material-icons">remove</i></button>
+                                        </div>
+                                    </div>
+                                }
+                                <button type="button" id="extra" class="text-success btn" onclick="createSymptom(@i); toggleCreate()"><i class="material-icons">add</i></button>
+
+                            </div>
+
+
+                        }
+                    </div>
+                    <button type="submit" class="btn btn-info">Update</button>
+                </form>
+
+
+            }
+            else
+            {
+                var lastUpdate = Model.LastUpdate;
+                var lastIndex = Model.Updates.Count;
+                <div id="tab-@lastIndex" style="display:block">
+                    <button class="btn btn-info" type="button" onclick="switchTab(@lastIndex, @lastIndex-1)"><i class="material-icons">arrow_back</i></button>
+                    <form asp-action="CreateUpdate" method="post">
+                        <input type="hidden" name="patientId" value="@Model.Patient.ID" />
+                        <input type="hidden" name="timestamp" id="timestamp" value="@DateTime.UtcNow" />
+                        <div class="form-group">
+                            <label for="fname">Treatment:</label>
+                            <input type="text" id="currTreatment" name="currTreatment" value="@lastUpdate.currentTreatment" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="fname">Treatment Comments:</label>
+                            <input type="text" id="currTreatComm" name="currTreatComm" value="@lastUpdate.currentTreatmentComments" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="fname">Current Symptoms:</label>
+                            @{
+                                var splitSymptoms = lastUpdate.currentSymptoms.Trim().Split(",");
+                                int i = 0;
+                                <input type="hidden" name="nbSymp" id="nbSymp" value="@splitSymptoms.Length" />
+                                <div class="row" id="symptomsContainer">
+                                    @for (i = 0; i < splitSymptoms.Length; i++)
+                                    {
+                                        var split = splitSymptoms[i].Split(":");
+                                        <div class="col-4" id="symptom @i">
+                                            <div class="form-inline">
+                                                <input type="text" id="currSymptom @i" name="currSymptom @i" value="@split[0]" class="form-control" style="width:40%" required />
+                                                <i class="material-icons">keyboard_arrow_right</i>
+                                                @if (split.Length > 1)
+                                                {
+                                                    <input type="text" id="currComment @i" name="currComment @i" value="@splitSymptoms[i].Split(":")[1]" class="form-control" style="width:40%" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="text" id="currComment @i" name="currComment @i" value="" class="form-control" style="width:40%" />
+                                                }
+                                            </div>
+                                            <button type="button" class="text-danger btn" onclick="removeSymptom(@i)"><i class="material-icons">remove</i></button>
+                                        </div>
+                                    }
+                                    <button type="button" id="extra" class="text-success btn" onclick="createSymptom(@i); toggleCreate()"><i class="material-icons">add</i></button>
+                                </div>
+                               
+
+                            }
+                        </div>
+                        <button type="submit" class="btn btn-info">Update</button>
+                    </form>
+                    <button class="btn btn-danger" type="button" onclick="location.href=' @Url.Action("DeleteUpdate", new { id = lastUpdate.Id, patientId = Model.Patient.ID }) '">Remove Update</button>
+
+                </div>
+                for (int j = 1; j < Model.Updates.Count-1; j++)
+                {
+                    <div id="tab-@j" style="display:none">
+                        <div class="card-group">
+                            <button class="btn btn-info" type="button" onclick="switchTab(@j, @j-1)"><i class="material-icons">arrow_back</i></button>
+                            <button class="btn btn-info" type="button" onclick="switchTab(@j, @j+1)"><i class="material-icons">arrow_forward</i></button>
+                        </div>
+                        <div class="card-group">
+                            <div class="card-text">>@Model.Updates[j].timestamp</div>
+                        </div>
+                        <div class="card-group">
+                            <div class="card-text">@Model.Updates[j].currentTreatment</div>
+                            <div class="card-text">@Model.Updates[j].currentTreatmentComments</div>
+                            <div class="card-text">@Model.Updates[j].currentSymptoms</div>
+
+                        </div>
+                        <button class="btn btn-danger" type="button" onclick="location.href=' @Url.Action("DeleteUpdate", new { id = Model.Updates[j].Id, patientId = Model.Patient.ID }) '">Remove Update</button>
+
+                    </div>
+                }
+                <div id="tab-0" style="display:none">
+                    <div class="card-group">
+                        <button class="btn btn-info" type="button" onclick="switchTab('0', '1')"><i class="material-icons">arrow_forward</i></button>
+                    </div>
+                    <div class="card-group">
+                        <div class="card-text">>@Model.Patient.symptomsDate</div>
+                    </div>
+                    <div class="card-group">
+                        <div class="card-text">@Model.Patient.treatment</div>
+                        <div class="card-text">@Model.Patient.treatmentComments</div>
+                        <div class="card-text">@Model.Patient.symptoms</div>
+
+                    </div>
+                </div>
+            }
+
+            @if (!Model.Patient.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00"))
+            {
+                <div class="card-text"><h6>Quarantined until:</h6> @Model.Patient.quarantineEndDate</div>
+                <form asp-action="StopQuarantine">
+                    <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
+                    <div>
+                        <input class="btn btn-danger list-group-item" type="submit" value="Stop quarantine" />
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="card-text">Patient did not need quaratine</div>
+                <form asp-action="StartQuarantine" >
+                    <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
+                    <div class="form-group">
+                        <label for="date">Select length of quarantine(days):</label>
+                        <input type="number" max="31" min="1" name="days" id="days" class="form-control"/>
+                        <input class="btn btn-success list-group-item" type="submit" value="Start quarantine" />
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+    <div class="card mt-3 mb-3">
+        <div class="row">
+            @if (searchCheck.ToString() == "True")
+            {
+                <div class="input-group col-1">
+                    <form asp-action="Index" asp-controller="HandlePatient" method="get">
+                        <input type="hidden" name="searchString" value="" />
+                        <input type="hidden" name="id" value="@modelSave.ID" />
+                        <button class="btn btn-info" type="submit"><i class="material-icons">arrow_back</i></button>
+                    </form>
+                </div>
+
+            }
+            <div class="input-group col-3">
+                <form class="form-inline" asp-action="Index" asp-controller="HandlePatient" method="get">
+                    <input type="hidden" name="id" value="@modelSave.ID" />
+                    <input class="form-control" type="text" name="searchString" />
+                    <div>
+                        <input class="btn btn-info" type="submit" value="Search" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6" style="overflow:scroll; max-height:300px;" id="scrollable">
+                    @{
+                        if (Model.Messages != null)
+                        {
+
+                            @foreach (var e in Model.Messages)
+                            {
+                                <div class="row">
+                                    @if (e.toAddress.Trim() == Model.Patient.emailAddress.Trim())
+                                    {
+                                        <div class="col-6"></div>
+                                        <div class="col-6 bg-primary">
+                                            <p class="text-white float-right">@e.content</p>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-6 border-primary">
+                                            <p class="text-primary float-left">@e.content</p>
+                                        </div>
+                                        <div class="col-6"></div>
+
+                                    }
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+                <div class="col-6">
+                    <form asp-action="SendMessage">
+                        <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
+
+                        <div class="form-group">
+                            <textarea class="form-control" id="message" name="message" placeholder="Add a message..." required></textarea>
+                        </div>
+                        <div>
+                            <input class="btn btn-primary" type="submit" value="Send" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+        
+    </div>
+    
+
+
+
+
+

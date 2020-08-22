@@ -1,0 +1,110 @@
+﻿@model IEnumerable<VirusTracker.Models.Patient>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutLoggedin.cshtml";
+    var searchCheck = TempData.Peek("searchCheck");
+}
+    <div class="row">
+        @if (searchCheck.Equals("true"))
+        {
+            <div class="input-group col-1">
+                <form asp-action="Index" asp-controller="Dashboard" method="get">
+                    <input type="hidden" name="searchString" value="" />
+                    <button class="btn btn-info" type="submit"><i class="material-icons">arrow_back</i></button>
+                </form>
+            </div>
+            
+        }
+
+        <div class="input-group col-3">
+            <form asp-action="Index" asp-controller="Dashboard" method="get">
+                <input class="form-control" type="text" name="searchString" />
+                <div>
+                    <input class="btn btn-info" type="submit" value="Search" />
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    
+    <table class="table table-striped">
+
+        <thead>
+            <tr>
+                <th scope="col">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["fNameSort"]">First Name</a>
+                </th>
+           
+                <th scope="col">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["lNameSort"]">Last Name</a>
+                </th>
+                <th scope="col">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["addressSort"]">Address</a>
+</th>
+                <th scope="col">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["genderSort"]">Gender</a>
+</th>
+                <th scope="col">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["ageSort"]">Age</a>
+</th>
+                <th scope="col">
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["symptomsSort"]">Symptoms</a>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var splitSymptoms = item.symptoms.Split(',');
+                List<Tuple<string, string>> tuples = new List<Tuple<string, string>>();
+                foreach(var s in splitSymptoms)
+                {
+                    var split = s.Split(":");
+                    tuples.Add(new Tuple<string, string>(split[0], "something"));
+                }
+                var iSymptom = tuples[tuples.Count - 1].Item1;
+            <tr  scope="row">
+                <td>
+                    @Html.DisplayFor(modelItem => item.firstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.lastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.gender)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.age)
+                </td>
+                @if (iSymptom.ToLower().Contains("fever") || iSymptom.ToLower().Contains("dry") || iSymptom.ToLower().Contains("tired"))
+                {
+                    <td class="badge badge-success mt-2">
+                        @Html.DisplayFor(modelItem => iSymptom)
+                    </td>
+                }
+                else if (iSymptom.ToLower().Contains("breath") || iSymptom.ToLower().Contains("chest") || iSymptom.ToLower().Contains("loss"))
+                {
+                    <td class="badge badge-danger  mt-2">
+                        @Html.DisplayFor(modelItem => iSymptom)
+                    </td>
+                }
+                else
+                {
+                    <td class="badge badge-warning  mt-2">
+                        @Html.DisplayFor(modelItem => iSymptom)
+                    </td>
+                }
+
+                <td>
+                    <input class="btn btn-primary" type="button" title="Select" value="Select" onclick="location.href='@Url.Action("Index", "AddPatient", new { id = item.ID })'" />
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+

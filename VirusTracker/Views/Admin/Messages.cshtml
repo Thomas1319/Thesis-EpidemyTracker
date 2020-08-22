@@ -1,0 +1,211 @@
+﻿@model List<Message>
+@{
+    ViewData["Title"] = "Messages";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<script>
+    function toggle(id1, id2) {
+        x = document.getElementById(id1);
+        y = document.getElementById(id2);
+        x.style.display = "none";
+        y.style.display = "block";
+    }
+</script>
+<!--INTERNAL-->
+<div id="internal" style="display:block">
+    <div class="d-inline">
+        <h4>Internal messages:</h4>
+        <button class="btn btn-info" type="button" onclick="toggle('internal', 'external')">Show External Messages</button>
+
+    </div>
+    
+
+    @{
+        <hr />
+        var intern = Model.FindAll(m => m.type.Trim() == "internal");
+        @if (intern.Count > 0)
+        {
+            var unanswered = intern.FindAll(m => m.answer == null);
+            var answered = intern.FindAll(m => m.answer != null);
+            @if (unanswered.Count > 0)
+            {
+                <h2>Unanswered</h2>
+                foreach (var m in unanswered)
+                {
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-group">
+                                <div class="card-title">@m.Name</div>
+                            </div>
+                            <div class="card-group">
+                                <p class="card-title">@m.subject</p>
+                                <p class="card-text">@m.timestamp</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-group">
+                                <p class="card-text">@m.messageContent</p>
+                            </div>
+                            <form asp-action="AnswerInternal" asp-controller="Message" method="post">
+                                <input type="hidden" name="messageId" value="@m.ID" />
+                                <div class="form-group">
+                                    <textarea class="form-control" name="answer" placeholder="Write your answer here..." required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-info" type="submit">Answer</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h5>There are no Unanswered Messages</h5>
+            }
+
+            @if (answered.Count > 0)
+            {
+                <hr />
+                <h2>Answered</h2>
+                @foreach (var m in answered)
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-group">
+                                <div class="card-title">@m.Name</div>
+                            </div>
+                            <div class="card-group">
+                                <p class="card-title">@m.subject</p>
+                                <p class="card-text">@m.timestamp</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-group">
+                                <p class="card-text">@m.messageContent</p>
+                            </div>
+                            <div class="card-group">
+                                <p class="card-text">@m.answer</p>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+
+            }
+            else
+            {
+                <hr />
+                <h5>There are no Answered Messages</h5>
+            }
+        }
+        else
+        {
+            <h5>There are no Internal Messages</h5>
+        }
+
+
+    }
+</div>
+    
+
+
+<!--EXTERNAL-->
+<div id="external" style="display:none">
+    <div class="d-inline">
+        <h4>External messages:</h4>
+        <button class="btn btn-info" type="button" onclick="toggle('external','internal')">Show Internal Messages</button>
+    </div>
+    
+
+    @{
+        <hr />
+        var ext = Model.FindAll(m => m.type.Trim() == "external");
+        @if (ext.Count > 0)
+        {
+            var unanswered = ext.FindAll(m => m.answer == null);
+            var answered = ext.FindAll(m => m.answer != null);
+            @if (unanswered.Count > 0)
+            {
+                <h2>Unanswered</h2>
+                foreach (var m in unanswered)
+                {
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-group">
+                                <div class="card-title">@m.Name</div>
+                            </div>
+                            <div class="card-group">
+                                <p class="card-title">@m.subject</p>
+                                <p class="card-text">@m.timestamp</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-group">
+                                <p class="card-text">@m.messageContent</p>
+                            </div>
+                            <form asp-action="AnswerExternal" asp-controller="Message" method="post">
+                                <input type="hidden" name="messageId" value="@m.ID" />
+                                <div class="form-group">
+                                    <textarea class="form-control" name="answer" placeholder="Write your answer here..." required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-info" type="submit">Answer</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h5>There are no Unanswered Messages</h5>
+            }
+
+            @if (answered.Count > 0)
+            {
+                <hr />
+                <h2>Answered</h2>
+                @foreach (var m in answered)
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-group">
+                                <div class="card-title">@m.Name</div>
+                            </div>
+                            <div class="card-group">
+                                <p class="card-title">@m.subject</p>
+                                <p class="card-text">@m.timestamp</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-group">
+                                <p class="card-text">@m.messageContent</p>
+                            </div>
+                            <div class="card-group">
+                                <p class="card-text">@m.answer</p>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+
+            }
+            else
+            {
+                <hr />
+                <h5>There are no Answered Messages</h5>
+            }
+        }
+        else
+        {
+            <h5>There are no External Messages</h5>
+        }
+
+
+    }
+</div>

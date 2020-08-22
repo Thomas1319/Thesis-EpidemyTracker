@@ -1,0 +1,49 @@
+﻿@model List<EnrollModel>
+@{
+    ViewData["Title"] = "Requests";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Requests</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email Address</th>
+            <th>CV</th>
+            <th>Letter</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @{
+            foreach (var e in Model)
+            {
+                if (e.status == null)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => e.firstName)</td>
+                        <td>@Html.DisplayFor(modelItem => e.lastName)</td>
+                        <td>@e.emailAddress</td>
+                        <td>
+                            <a href="@Url.Action("GetDocument", "Admin", new{document = "CV", id = e.Id})"><i class="material-icons">description</i></a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("GetDocument", "Admin", new{document = "Letter", id = e.Id})"><i class="material-icons">description</i></a>
+                        </td>
+                        <td>
+                            <input class="btn btn-danger" type="button" title="Approve" value="Approve" onclick="location.href='@Url.Action("ApproveDoctor", new {id = e.Id })'" />
+                        </td>
+                        <td>
+                            <input class="btn btn-danger" type="button" title="Deny" value="Deny" onclick="location.href='@Url.Action("DenyDoctor", new { id = e.Id})'" />
+                        </td>
+                    </tr>
+                }
+
+
+            }
+        }
+    </tbody>
+</table>
+

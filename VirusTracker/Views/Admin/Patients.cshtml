@@ -1,0 +1,46 @@
+﻿@model List<Patient>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<h3>Patients</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Gender</th>
+            <th>Age</th>
+            <th>Status</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @{
+            foreach (var p in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => p.firstName)</td>
+                    <td>@Html.DisplayFor(modelItem => p.lastName)</td>
+                    <td>@Html.DisplayFor(modelItem => p.gender)</td>
+                    <td>@Html.DisplayFor(modelItem => p.age)</td>
+                    @if(DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
+                    {
+                        <td class="text-danger">Sick</td>
+                    } else
+                    {
+                        <td class="text-success">Healthy</td>
+                    }
+                    <td>
+                        <input class="btn btn-info" type="button" title="Edit" value="Edit" onclick="location.href='@Url.Action("EditPatient", new { patientId = p.ID })'" />
+                    </td>
+                    <td>
+                        <input class="btn btn-danger" type="button" title="Remove" value="Remove" onclick="location.href='@Url.Action("RemovePatient", new { patientId = p.ID })'" />
+                    </td>
+                </tr>
+
+            }
+        }
+    </tbody>
+</table>
+

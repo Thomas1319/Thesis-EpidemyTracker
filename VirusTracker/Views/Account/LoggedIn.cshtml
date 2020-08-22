@@ -1,0 +1,14 @@
+﻿@page
+@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "Logged in";
+}
+
+@{ 
+
+    if (ViewBag.ID != null)
+    {
+    <p>@ViewBag.firstName @ViewBag.lastName</p>
+    }
+    <a asp-action="LogOut">Log out</a>
+}

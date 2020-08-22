@@ -1,0 +1,249 @@
+﻿@page
+@model VirusQuestionaire.Pages.QuestionaireModel
+@{
+    ViewData["Title"] = "Questionaire";
+}
+<script>
+    function toggler(value) {
+        var x = document.getElementById(value);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
+
+<body>
+    <form enctype="multipart/form-data"  method="post">
+        <h2>Personal Information</h2>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Patient.firstName" class="control-label">First Name</label>
+            <input asp-for="Patient.firstName" type="text" class="form-control">
+            <span asp-validation-for="Patient.firstName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Patient.lastName" class="control-label">Last Name</label>
+            <input asp-for="Patient.lastName" class="form-control" />
+            <span asp-validation-for="Patient.lastName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Patient.phoneNumber" class="control-label">Phone Number</label>
+            <input asp-for="Patient.phoneNumber" class="form-control" placeholder="+4072..." />
+            <span asp-validation-for="Patient.phoneNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Patient.emailAddress" class="control-label">Email address</label>
+            <input asp-for="Patient.emailAddress" class="form-control" placeholder="name@address.org" />
+            <span asp-validation-for="Patient.emailAddress" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Patient.address" class="control-label">Home Address</label>
+            <input asp-for="Patient.address" class="form-control" placeholder="Street Nb, City..."/>
+            <span asp-validation-for="Patient.address" class="text-danger"></span>
+        </div>
+        <button type="button" class="btn btn-info" onclick="toggler('contactPerson')">Add contact person</button>
+        <div id="contactPerson" style="display:none">
+            <h2>Contact person</h2>
+            <hr />
+            <div class="form-group">
+                <label asp-for="Patient.contactFirstName" class="control-label">First Name</label>
+                <input asp-for="Patient.contactFirstName" class="form-control" />
+                <span asp-validation-for="Patient.contactFirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Patient.contactLastName" class="control-label">Last Name</label>
+                <input asp-for="Patient.contactLastName" class="form-control"/>
+                <span asp-validation-for="Patient.contactLastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Patient.contactPhoneNumber" class="control-label">Phone Number</label>
+                <input asp-for="Patient.contactPhoneNumber" class="form-control" placeholder="+4072..." />
+                <span asp-validation-for="Patient.contactPhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Patient.contactEmailAddress" class="control-label">Email address</label>
+                <input asp-for="Patient.contactEmailAddress" class="form-control" placeholder="name@address.org" />
+                <span asp-validation-for="Patient.contactEmailAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Patient.contactAddress" class="control-label">Home Address</label>
+                <input asp-for="Patient.contactAddress" class="form-control" placeholder="Street Nb, City..." />
+                <span asp-validation-for="Patient.contactAddress" class="text-danger"></span>
+            </div>
+        </div>
+        <h2>Patient details</h2>
+        <hr />
+        <div class="form-group">
+            <label asp-for="Patient.gender" class="control-label">Gender</label>
+            <select asp-for="Patient.gender" class="form-control">
+                <option>Male</option>
+                <option>Female</option>
+            </select>
+            <span asp-validation-for="Patient.gender" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Patient.age" class="control-label">Age</label>
+            <input asp-for="Patient.age" class="form-control" placeholder="0-99"/>
+            <span asp-validation-for="Patient.age" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Patient.height" class="control-label">Height</label>
+            <input asp-for="Patient.height" class="form-control" placeholder="0-200 cm"/>
+            <span asp-validation-for="Patient.height" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Patient.weight" class="control-label">Weight</label>
+            <input asp-for="Patient.weight" class="form-control" placeholder="0-200"/>
+            <span asp-validation-for="Patient.weight" class="text-danger"></span>
+        </div>
+        <h2>Observed Symptoms</h2>
+        <hr />
+        <div class="form-group">
+            <label asp-for="Patient.symptomsDate" class="control-label">Date when symptoms appeared</label>
+            <input asp-for="Patient.symptomsDate" type="date" class="form-control">
+            <span asp-validation-for="Patient.symptomsDate" class="text-danger"></span>
+        </div>
+
+
+        <div class="form-group">
+            @{
+                var aux =(string)ViewData["symptoms"];
+                string[] split = aux.Split(',');
+                List<string> symptoms = new List<string>(split);
+                foreach (var s in symptoms)
+                {
+                    var idaux = s.Split(" ")[0] + "Extra";
+                        <div class="form-group form-inline">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="@s" name="symptom" value="@s" onclick="toggler('@idaux')">
+                                <label class="custom-control-label" for="@s">@s</label>
+                            </div>
+                            @if (s == "fever")
+                            {
+                                <input style="display:none" maxlength="20" type="text" class="form-control ml-3" id="feverExtra" name="extra" placeholder="Temperature(Celsius)">
+                            }
+                            else if (s == "dry cough")
+                            {
+                                <select style="display:none" class="form-control ml-3" name="extra" id="dryExtra">
+                                    <option value="with pain">With pain</option>
+                                    <option value="without pain">Without pain</option> 
+                                </select>
+                            }
+                            else if (s == "aches and pains")
+                            {
+                                <select style="display:none" class="form-control ml-3" name="extra" id="achesExtra">
+                                    <option value="pulsating">Pulsating</option>
+                                    <option value="constant">Constant</option>
+                                    <option value="tactile">Tactile(when touching the area)</option>
+                                </select>
+                            }
+                            else if (s == "headache")
+                            {
+                                <select style="display:none" class="form-control ml-3" name="extra" id="headacheExtra">
+                                    <option value="pulsating">Pulsating</option>
+                                    <option value="constant">Constant</option>
+                                </select>
+                            }
+                            else if (s == "rashes on skin")
+                            {
+                                <select style="display:none" class="form-control ml-3" name="extra" id="rashesExtra">
+                                    <option value="ticklish">Ticklish</option>
+                                    <option value="painful">Painful</option>
+                                </select>
+                            }
+                            else if (s == "difficulty breathing")
+                            {
+                                <select style="display:none" class="form-control ml-3" name="extra" id="difficultyExtra">
+                                    <option value="with pain">With chest pain</option>
+                                    <option value="without pain">Without chest pain</option>
+                                </select>
+                            } else
+                            {
+                               <input style="display:none" maxlength="50" type="text" class="form-control ml-3" id="@idaux" name="extra" placeholder="Short comment...">
+                            }
+                        </div>
+                        
+                        
+                }
+            }
+            @*<div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="fever" name="symptom" value="Fever">
+            <label class="custom-control-label" for="fever">Fever</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="dry cough" name="symptom" value="Dry cough">
+            <label class="custom-control-label" for="dry cough">Dry cough</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="tiredness" name="symptom" value="Tiredness">
+            <label class="custom-control-label" for="tiredness">Tiredness</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="aches and pains" name="symptom" value="Aches and pains">
+            <label class="custom-control-label" for="aches and pains">Aches and pains</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="sore throat" name="symptom" value="Sore throat">
+            <label class="custom-control-label" for="sore throat">Sore throat</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="diarrhoea" name="symptom" value="Diarrhoea">
+            <label class="custom-control-label" for="diarrhoea">Diarrhoea</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="conjunctivitis" name="symptom" value="Conjunctivitis">
+            <label class="custom-control-label" for="conjunctivitis">Conjunctivitis</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="headache" name="symptom" value="Headache">
+            <label class="custom-control-label" for="headache">Headache</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="loss of taste or smell" name="symptom" value="Loss of taste or smell">
+            <label class="custom-control-label" for="loss of taste or smell">Loss of taste or smell</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="a rash on skin" name="symptom" value="A rash on skin">
+            <label class="custom-control-label" for="a rash on skin">A rash on skin</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="discolouration of fingers or toes" name="symptom" value="Discolouration of fingers or toes">
+            <label class="custom-control-label" for="discolouration of fingers or toes">Discolouration of fingers or toes</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="difficulty breathing" name="symptom" value="Difficulty breathing">
+            <label class="custom-control-label" for="difficulty breathing">Difficulty breathing</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="chest pain or pressure" name="symptom" value="Chest pain or pressure">
+            <label class="custom-control-label" for="chest pain or pressure">Chest pain or pressure</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="loss of speech or movement" name="symptom" value="Loss of speech or movement">
+            <label class="custom-control-label" for="loss of speech or movement">Loss of speech or movement</label>
+        </div>*@
+            <input type="hidden" asp-for="Patient.symptoms" value="placeholder" />
+            <span asp-validation-for="Patient.symptoms" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Patient.additionalComments" class="control-label">Additional medical information(allergies, know diseases, treatments etc.)</label>
+            <input asp-for="Patient.additionalComments" class="form-control" placeholder="..."/>
+            <span asp-validation-for="Patient.additionalComments" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="files">Please add your medical record or other relevant personal medical documents(PDF)</label>
+            <input name="files" type="file" multiple />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Submit" class="btn btn-primary" />
+        </div>
+    </form>
+</body>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,265 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using VirusTracker.Data;
+using VirusTracker.Models;
+using MimeKit;
+using MailKit;
+using MailKit.Security;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Authorization;
+using VirusTracker.Helpers;
+using System.Dynamic;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+
+namespace VirusTracker.Controllers
+{
+    [Authorize(Roles = "DefaultUser, Administrator")]
+    public class HandlePatientController : Controller
+    {
+        private readonly VirusTrackerContext _dataContext;
+        private readonly UserManager<Doctor> _userManager;
+        private readonly SignInManager<Doctor> _signInManager;
+        private readonly IEmailConfiguration _emailConfiguration;
+        private Dictionary<string, string> fileTypes;
+        private readonly string docsPath;
+
+        public HandlePatientController(UserManager<Doctor> userManager, SignInManager<Doctor> signInManager, VirusTrackerContext dataContext, IEmailConfiguration emailConfiguration)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _dataContext = dataContext;
+            _emailConfiguration = emailConfiguration;
+            fileTypes = new Dictionary<string, string>() {  { ".pdf", "application/pdf" },
+                                                            { ".doc", "application/msword" },
+                                                            { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" } };
+            docsPath = Directory.GetParent(Environment.CurrentDirectory) + "/NewPatients";
+        }
+        public async Task<IActionResult> Index(string id, string searchString)
+        {
+            var doctor = await _userManager.GetUserAsync(User);
+            var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == id);
+
+            var path = Path.Combine(docsPath, currentPatient.ID + "_" + currentPatient.firstName.Trim() + "_" + currentPatient.lastName.Trim());
+            //System.Diagnostics.Debug.WriteLine(path);
+
+            EmailService emailService = new EmailService(_emailConfiguration); //MAYBE MOVE THIS SOMEWHERE ELSE
+            var emails = emailService.ReceiveEmail(currentPatient, doctor);
+            if (emails.Count > 0)
+            {
+                foreach(var e in emails)
+                {
+                    _dataContext.Emails.Add(e);
+                    await _dataContext.SaveChangesAsync();
+                    _dataContext.Patient.First(p => p.ID == currentPatient.ID).messages += e.Id + ",";
+                }
+            }
+            await _dataContext.SaveChangesAsync();
+            var emailsId = currentPatient.messages.Split(",").ToList();
+            var messages = _dataContext.Emails.Where(e => emailsId.Contains(e.Id.ToString())).ToList().OrderBy(d => d.date);
+
+            //var emails = _dataContext.Emails.Where(e => emailsId.Contains(e.Id.ToString())).ToList();
+            //emails.OrderBy(d => d.date).ToList();
+
+
+            dynamic mymodel = new ExpandoObject();
+            var updates = _dataContext.PatientUpdates.Where(u => u.patientId == currentPatient.ID).ToList();
+            if (updates.Count > 0)
+            {
+                updates.OrderBy(d => d.timestamp);
+                mymodel.Updates = updates;
+                mymodel.LastUpdate = updates.LastOrDefault();
+            }
+            else
+            {
+                mymodel.LastUpdate = null;
+                mymodel.Updates = null;
+            }
+            mymodel.Patient = currentPatient;
+           // mymodel.Messages = messages;
+            mymodel.Documents = Directory.GetFiles(path).ToList().Count;
+            TempData["doctorId"] = doctor.Id;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                TempData["searchCheck"] = true;
+                searchString = searchString.ToLower();
+                var filtered = messages.Where(m => m.content.ToLower().Contains(searchString));
+                mymodel.Messages = filtered;
+                return View(mymodel);
+            } else
+            {
+                TempData["searchCheck"] = false;
+                mymodel.Messages = messages;
+                return View(mymodel);
+            }
+            //System.Diagnostics.Debug.WriteLine(currentPatient.firstName + "-------------------------");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(string patientId, string message)
+        {
+            var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == patientId);
+            var doctor = await _userManager.GetUserAsync(User);
+            if(message != null)
+            {
+                EmailMessage emailMessage = new EmailMessage();
+                EmailAddress from = new EmailAddress();
+                from.Name = doctor.firstName + " " + doctor.lastName;
+                from.Address = doctor.Email.Trim();
+
+                EmailAddress to = new EmailAddress();
+                to.Name = currentPatient.firstName + " " + currentPatient.lastName;
+                to.Address = currentPatient.emailAddress.Trim();
+
+                emailMessage.ToAddress = to;
+                emailMessage.FromAddress = from;
+                emailMessage.Subject = "Epidemy tracker response";
+                emailMessage.Content = message;
+
+                var newEmail = new EmailsModel();
+                newEmail.doctorId = doctor.Id;
+                newEmail.patientId = currentPatient.ID.ToString();
+                newEmail.fromAddress = doctor.Email;
+                newEmail.toAddress = currentPatient.emailAddress;
+                newEmail.content = message;
+                newEmail.date = DateTime.UtcNow;
+                newEmail.subject = "Epidemy tracker response";
+                _dataContext.Emails.Add(newEmail);
+                await _dataContext.SaveChangesAsync();
+                _dataContext.Patient.First(p => p.ID == currentPatient.ID).messages += newEmail.Id.ToString() + ",";
+                await _dataContext.SaveChangesAsync();
+
+                EmailService emailService = new EmailService(_emailConfiguration);
+                emailService.AnswerPatient(emailMessage, currentPatient, doctor);
+            }
+            
+
+            return RedirectToAction("Index", new {id = patientId });
+
+            
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUpdate(IFormCollection data)
+        {
+            System.Diagnostics.Debug.WriteLine("0");
+            var allUpdates = _dataContext.PatientUpdates.Where(u => u.patientId.ToString() == data["patientId"].ToString()).ToList();
+            var patient = _dataContext.Patient.First<Patient>(p => p.ID == Int32.Parse(data["patientId"]));
+            var update = new PatientUpdateModel();
+            System.Diagnostics.Debug.WriteLine("1");
+            System.Diagnostics.Debug.WriteLine(data["nbSymp"]);
+            var currSympBuilder = "";
+            update.patientId = Int32.Parse(data["patientId"]);
+            update.timestamp = DateTime.Parse(data["timestamp"]);
+            var size = Int32.Parse(data["nbSymp"]);
+            if (data["currSymp" + size] != "")
+                size += 1;
+            for(int i = 0; i < size; i++)
+            {
+                if(data["currSymptom " + i].ToString().Trim() != "")
+                    currSympBuilder += data["currSymptom " + i].ToString().Trim() + ":" + data["currComment " + i].ToString().Trim() + ",";
+                System.Diagnostics.Debug.WriteLine(currSympBuilder);
+            }
+                    
+            if(currSympBuilder.Length > 0)
+            {
+                currSympBuilder = currSympBuilder.Substring(0, currSympBuilder.Length - 1);
+                update.currentSymptoms = currSympBuilder;
+            } else
+            {
+                update.currentSymptoms = "";
+            }
+            update.currentTreatment = data["currTreatment"];
+            update.currentTreatmentComments = data["currTreatComm"];
+            if(allUpdates.Find(c =>  c.currentSymptoms == update.currentSymptoms
+                                && c.currentTreatment == update.currentTreatment && c.currentTreatmentComments == c.currentTreatmentComments) == null && 
+                                ((update.currentSymptoms == patient.symptoms.Trim()
+                                && update.currentTreatment == patient.treatment.Trim() && update.currentTreatmentComments == patient.treatmentComments.Trim())) == false)
+            {
+                System.Diagnostics.Debug.WriteLine("2");
+
+                _dataContext.PatientUpdates.Add(update);
+                await _dataContext.SaveChangesAsync();
+                return RedirectToAction("Index", new { id = data["patientId"] });
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("3");
+
+                System.Diagnostics.Debug.WriteLine("Nothing changed");
+                return RedirectToAction("Index", new { id = data["patientId"] });
+            }
+        }
+
+        public async Task<IActionResult> DeleteUpdate(string id, string patientId)
+        {
+            System.Diagnostics.Debug.WriteLine("IN DELETE" + id);
+            var toDelete = _dataContext.PatientUpdates.First(u => u.Id.ToString() == id);
+            _dataContext.PatientUpdates.Remove(toDelete);
+            await _dataContext.SaveChangesAsync();
+            return RedirectToAction("Index", new { id = patientId });
+            
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StartQuarantine(IFormCollection data)
+        {
+            var currentPatient = _dataContext.Patient.First(p => p.ID.ToString() == data["patientId"].ToString());
+            System.Diagnostics.Debug.WriteLine(data["days"]);
+            currentPatient.quarantineEndDate = DateTime.UtcNow.AddDays(Double.Parse(data["days"].ToString()));
+            await _dataContext.SaveChangesAsync();
+
+            return RedirectToAction("Index", new { id = data["patientId"] });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StopQuarantine(string patientId)
+        {
+            var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == patientId);
+            currentPatient.quarantineEndDate = DateTime.Parse("13/02/1999 00:00:00");
+            await _dataContext.SaveChangesAsync();
+
+            return RedirectToAction("Index", new { id = patientId });
+        }
+
+        public async Task<IActionResult> GetDocument(string number, string id)
+        {
+            var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == id);
+            var path = Path.Combine(docsPath, currentPatient.ID + "_" + currentPatient.firstName.Trim() + "_" + currentPatient.lastName.Trim());
+            System.Diagnostics.Debug.WriteLine(path);
+            var files = Directory.GetFiles(path).ToList();
+            string toFind = null;
+            foreach (var f in files)
+            {
+                if (f.Contains(currentPatient.firstName.Trim() + "_" + currentPatient.lastName.Trim() + "_" + number))
+                {
+                    toFind = f;
+                    break;
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine(path);
+            System.Diagnostics.Debug.WriteLine(toFind);
+            if (toFind != null)
+            {
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(toFind, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                var contentType = fileTypes.FirstOrDefault(t => t.Key == Path.GetExtension(toFind).ToLowerInvariant()).Value;
+                return File(memory, contentType, Path.GetFileName(toFind));
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("File not found");
+                return RedirectToAction("HandlePatient");
+            }
+        }
+    }
+}
