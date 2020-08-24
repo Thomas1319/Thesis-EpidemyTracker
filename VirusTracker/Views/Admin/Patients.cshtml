@@ -3,6 +3,32 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
+<script>
+    $(document).ready(function () {
+        $('#toFade').delay(3000).fadeOut();
+    });
+</script>
+@if (TempData["patientName"] != null && TempData["patientDate"] != "fail")
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        <strong>@TempData["patientName"]</strong> removed successfully!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["patientName"] == "fail")
+{
+
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
 <h3>Patients</h3>
 <table class="table">
     <thead>
@@ -17,6 +43,7 @@
     </thead>
     <tbody>
         @{
+
             foreach (var p in Model)
             {
                 <tr>
@@ -24,10 +51,11 @@
                     <td>@Html.DisplayFor(modelItem => p.lastName)</td>
                     <td>@Html.DisplayFor(modelItem => p.gender)</td>
                     <td>@Html.DisplayFor(modelItem => p.age)</td>
-                    @if(DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
+                    @if (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
                     {
                         <td class="text-danger">Sick</td>
-                    } else
+                    }
+                    else
                     {
                         <td class="text-success">Healthy</td>
                     }
@@ -35,7 +63,10 @@
                         <input class="btn btn-info" type="button" title="Edit" value="Edit" onclick="location.href='@Url.Action("EditPatient", new { patientId = p.ID })'" />
                     </td>
                     <td>
-                        <input class="btn btn-danger" type="button" title="Remove" value="Remove" onclick="location.href='@Url.Action("RemovePatient", new { patientId = p.ID })'" />
+                        <form id="removePatient" asp-action="RemovePatient">
+                            <input type="hidden" name="patientId" value="@p.ID" />
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
                     </td>
                 </tr>
 

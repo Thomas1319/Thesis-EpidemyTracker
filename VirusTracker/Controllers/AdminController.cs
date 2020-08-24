@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using VirusTracker.Data;
 using VirusTracker.Models;
 using VirusTracker.Helpers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace VirusTracker.Controllers
 {
@@ -84,16 +85,24 @@ namespace VirusTracker.Controllers
 
         public async Task<IActionResult> RemoveDoctor(string doctorId)
         {
-            System.Diagnostics.Debug.WriteLine("blabla" + doctorId);
+            //System.Diagnostics.Debug.WriteLine("blabla" + doctorId);
             var toRemove = await _userManager.FindByIdAsync(doctorId);
-            var patients = _dataContext.Patient;
-            foreach(var p in patients)
+            if (toRemove!= null)
             {
-                if (p.doctorId == toRemove.Id)
-                    p.doctorId = null;
+                var patients = _dataContext.Patient;
+                foreach (var p in patients)
+                {
+                    if (p.doctorId == toRemove.Id)
+                        p.doctorId = null;
+                }
+                _dataContext.Codes.FirstOrDefault(c => c.doctorId == toRemove.Id).doctorId = null;
+                await _dataContext.SaveChangesAsync();
+                await _userManager.DeleteAsync(toRemove);
+                TempData["doctorName"] = toRemove.firstName + " " + toRemove.lastName;
+            } else
+            {
+                TempData["doctorName"] = "fail";
             }
-            await _dataContext.SaveChangesAsync();
-            await _userManager.DeleteAsync(toRemove);
             return RedirectToAction("Index");
         }
 
@@ -147,25 +156,46 @@ namespace VirusTracker.Controllers
             return RedirectToAction("EditPatient", new { patientId = formdata["id"] });
         }
 
-        public async Task<IActionResult> RemovePatient(int patientId)
+        [HttpPost]
+        public async Task<IActionResult> RemovePatient(IFormCollection data)
         {
-            var toRemove = await _dataContext.Patient.FindAsync(patientId);
-            _dataContext.Remove(toRemove);
-            await _dataContext.SaveChangesAsync();
+            var toRemove = await _dataContext.Patient.FindAsync(Int32.Parse(data["patientId"]));
+            if(toRemove!= null)
+            {
+                _dataContext.Remove(toRemove);
+                await _dataContext.SaveChangesAsync();
+                //await Response.WriteAsync("Patient " + toRemove.firstName.Trim() + " " + toRemove.lastName.Trim() + " has been removed successfully!");
+                TempData["patientName"] = toRemove.firstName + " " + toRemove.lastName;
+            } else
+            {
+                TempData["patientName"] = "fail";
+            }
+            
             return RedirectToAction("Patients");
         }
 
         public async Task<IActionResult> AnswerMessage(int messageId, string answer)
         {
-            _dataContext.Message.Find(messageId).answer = answer;
-            await _dataContext.SaveChangesAsync();
+            var x = _dataContext.Message.Find(messageId);
+            
+
             return RedirectToAction("Messages");
         }
         public async Task<IActionResult> RemoveMessage(int messageId)
         {
             var toRemove = await _dataContext.Message.FindAsync(messageId);
-            _dataContext.Remove(toRemove);
-            await _dataContext.SaveChangesAsync();
+            if(toRemove != null)
+            {
+                _dataContext.Remove(toRemove);
+                await _dataContext.SaveChangesAsync();
+                TempData["messageCheck"] = "Message removed successfully";
+
+            }
+            else
+            {
+                TempData["messageCheck"] = "fail";
+            }
+
             return RedirectToAction("Messages");
         }
         public async Task<IActionResult> GetDocument(string document, string id)
@@ -204,34 +234,42 @@ namespace VirusTracker.Controllers
         }
         public async Task<IActionResult> ApproveDoctor(string id)
         {
-            System.Diagnostics.Debug.WriteLine("1");
+            //System.Diagnostics.Debug.WriteLine("1");
             var code = _dataContext.Codes.First(c => c.doctorId == null);
-            var enrolled = _dataContext.Enroll.First(e => e.Id.ToString() == id);
-            enrolled.status = "approved";
-            EmailMessage emailMessage = new EmailMessage();
-            EmailAddress from = new EmailAddress();
-            from.Name = "EpidemyTracker Admin";
-            from.Address = "epidemytracker@gmail.com";
-            System.Diagnostics.Debug.WriteLine("2");
+            if (code!= null)
+            {
+                var enrolled = _dataContext.Enroll.First(e => e.Id.ToString() == id);
+                enrolled.status = "approved";
+                EmailMessage emailMessage = new EmailMessage();
+                EmailAddress from = new EmailAddress();
+                from.Name = "EpidemyTracker Admin";
+                from.Address = "epidemytracker@gmail.com";
+                // System.Diagnostics.Debug.WriteLine("2");
 
-            EmailAddress to = new EmailAddress();
-            to.Name = enrolled.firstName + " " + enrolled.lastName;
-            to.Address = enrolled.emailAddress.Trim();
+                EmailAddress to = new EmailAddress();
+                to.Name = enrolled.firstName + " " + enrolled.lastName;
+                to.Address = enrolled.emailAddress.Trim();
 
-            emailMessage.ToAddress = to;
-            emailMessage.FromAddress = from;
-            emailMessage.Subject = "Epidemy tracker response";
-            emailMessage.Content = "Hello " + enrolled.firstName + ", \n We are glad to announce you that you have been approved to register on our platform! We are looking forward to working " +
-                "with you in order to help people in need in such a a time of crysis. \n Your assigned register code is: " + code.Code.ToString() + ", please use it in order to create a new account.";
+                emailMessage.ToAddress = to;
+                emailMessage.FromAddress = from;
+                emailMessage.Subject = "Epidemy tracker response";
+                emailMessage.Content = "Hello " + enrolled.firstName + ", \n We are glad to announce you that you have been approved to register on our platform! We are looking forward to working " +
+                    "with you in order to help people in need in such a a time of crysis. \n Your assigned register code is: " + code.Code.ToString() + ", please use it in order to create a new account.";
 
-            EmailService emailService = new EmailService(_emailConfiguration);
-            System.Diagnostics.Debug.WriteLine("2.5");
+                EmailService emailService = new EmailService(_emailConfiguration);
+                // System.Diagnostics.Debug.WriteLine("2.5");
 
-            emailService.Send(emailMessage);
-            System.Diagnostics.Debug.WriteLine("3");
+                emailService.Send(emailMessage);
+           // System.Diagnostics.Debug.WriteLine("3");
 
-            await _dataContext.SaveChangesAsync();
-            System.Diagnostics.Debug.WriteLine("4");
+                await _dataContext.SaveChangesAsync();
+                TempData["requestCheck"] = "Request has been approved successfully";
+            } else
+            {
+                TempData["requestCheck"] = "fail";
+            }
+
+            // System.Diagnostics.Debug.WriteLine("4");
 
             return RedirectToAction("Requests");
         }
@@ -256,6 +294,8 @@ namespace VirusTracker.Controllers
             EmailService emailService = new EmailService(_emailConfiguration);
             emailService.Send(emailMessage);
             await _dataContext.SaveChangesAsync();
+            TempData["requestCheck"] = "Request has been denied successfully";
+
             return RedirectToAction("Requests");
         }
 

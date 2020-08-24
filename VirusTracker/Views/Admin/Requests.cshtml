@@ -3,7 +3,32 @@
     ViewData["Title"] = "Requests";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
+<script>
+    $(document).ready(function () {
+        $('#toFade').delay(3000).fadeOut();
+    });
+</script>
+@if (TempData["requestCheck"] != null && TempData["requestCheck"] != "fail")
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        @TempData["requestCheck"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["requestCheck"] == "fail")
+{
 
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
 <h1>Requests</h1>
 <table class="table">
     <thead>

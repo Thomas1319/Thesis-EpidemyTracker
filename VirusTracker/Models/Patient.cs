@@ -31,6 +31,18 @@ namespace VirusTracker.Models
         [RegularExpression(@"[^@]+@[^\.]+\..+")]
         public string emailAddress { get; set; }
 
+        [StringLength(60, MinimumLength = 0)]
+        public string contactFirstName { get; set; }
+        [StringLength(60, MinimumLength = 0)]
+        public string contactLastName { get; set; }
+        [StringLength(60, MinimumLength = 0)]
+        public string contactAddress { get; set; }
+        [StringLength(13, MinimumLength = 9)]
+        public string contactPhoneNumber { get; set; }
+        [RegularExpression(@"[^@]+@[^\.]+\..+")]
+        public string contactEmailAddress { get; set; }
+
+
         [Required]
         [Range(0,100)]
         public int age { get; set; }

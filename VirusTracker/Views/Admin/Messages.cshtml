@@ -4,6 +4,31 @@
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 <script>
+    $(document).ready(function () {
+        $('#toFade').delay(3000).fadeOut();
+    });
+</script>
+@if (TempData["messageCheck"] != "fail" && TempData["messageCheck"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        @TempData["messageCheck"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["messageCheck"] == "fail")
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+<script>
     function toggle(id1, id2) {
         x = document.getElementById(id1);
         y = document.getElementById(id2);
@@ -18,7 +43,7 @@
         <button class="btn btn-info" type="button" onclick="toggle('internal', 'external')">Show External Messages</button>
 
     </div>
-    
+
 
     @{
         <hr />
@@ -109,7 +134,7 @@
 
     }
 </div>
-    
+
 
 
 <!--EXTERNAL-->
@@ -118,7 +143,7 @@
         <h4>External messages:</h4>
         <button class="btn btn-info" type="button" onclick="toggle('external','internal')">Show Internal Messages</button>
     </div>
-    
+
 
     @{
         <hr />

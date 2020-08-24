@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using VirusTracker.Data;
+using VirusTracker.Helpers;
 using VirusTracker.Models;
 
 namespace VirusTracker.Controllers
@@ -42,11 +43,16 @@ namespace VirusTracker.Controllers
         public IActionResult Index()
         {
             var docList = _context.Doctor.ToList();
-           // System.Diagnostics.Debug.WriteLine(docList[0].Email.ToString() + "----------------------------------");
+
+            // System.Diagnostics.Debug.WriteLine(docList[0].Email.ToString() + "----------------------------------");
             return View(docList);
         }
         public IActionResult Register()
         {
+
+            DataSeeder data = new DataSeeder(_context);
+            //data.Seed(200);
+            //_context.SaveChanges();
             return View();
         }
 

@@ -497,3 +497,5 @@ D:\VS projects\Visual Studio proj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\Vi
 D:\VS projects\Visual Studio proj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\VirusTracker.pdb
 D:\VS projects\Visual Studio proj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\VirusTracker.genruntimeconfig.cache
 D:\VS projects\Visual Studio proj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\Razor\Views\Message\Index.cshtml.g.cs
+D:\VS projects\Visual Studio proj\Thesis\VirusTracker\bin\Debug\netcoreapp3.1\Data\PatientData.json
+D:\VS projects\Visual Studio proj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_RemovePatientPartial.cshtml.g.cs

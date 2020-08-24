@@ -33,7 +33,7 @@ namespace VirusQuestionaire.Pages
 
         public IActionResult OnGet()
         {
-            ViewData["symptoms"] = "fever,dry cough,tiredness,aches and pains,sore throat,diarrohea,conjuctivitis,headache,lack of taste or smell,rashes on skin,discolouration of fingers or toes,difficulty breathing,chest pain or pressure,loss of speech or movement";
+            ViewData["symptoms"] = "fever,dry cough,tiredness,aches and pains,sore throat,diarrhea,conjunctivitis,headache,lack of taste or smell,rashes on skin,discolouration of fingers or toes,difficulty breathing,chest pain or pressure,loss of speech or movement";
             return Page();
         }
 

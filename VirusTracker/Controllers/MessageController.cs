@@ -57,8 +57,16 @@ namespace VirusTracker.Controllers
         public async Task<IActionResult> AnswerInternal(IFormCollection data)
         {
             var msg = _dataContext.Message.ToList().Find(m => m.ID.ToString() == data["messageId"]);
-            msg.answer = data["answer"];
-            await _dataContext.SaveChangesAsync();
+            if (msg != null)
+            {
+                msg.answer = data["answer"];
+                await _dataContext.SaveChangesAsync();
+                TempData["messageCheck"] = "Internal message answered successfully";
+            }
+            else
+            {
+                TempData["messageCheck"] = "fail";
+            }
             return RedirectToAction("Messages", "Admin");
         }
 
@@ -66,16 +74,24 @@ namespace VirusTracker.Controllers
         public async Task<IActionResult> AnswerExternal(IFormCollection data)
         {
             var msg = _dataContext.Message.ToList().Find(m => m.ID.ToString() == data["messageId"]);
-            msg.answer = data["answer"];
-            await _dataContext.SaveChangesAsync();
-            EmailService emailService = new EmailService(_emailConfiguration);
-            EmailMessage email = new EmailMessage();
-            email.Content = msg.answer;
-            email.FromAddress = new EmailAddress() { Name = "EpidemyTracker Admin", Address = "epidemytracker@gmail.com" };
-            email.ToAddress = new EmailAddress() { Name = msg.Name.Trim(), Address = msg.Email.Trim() };
-            email.Subject = msg.subject + " - Answer";
-            emailService.Send(email);
-            await _dataContext.SaveChangesAsync();
+            if(msg != null)
+            {
+                msg.answer = data["answer"];
+                await _dataContext.SaveChangesAsync();
+                EmailService emailService = new EmailService(_emailConfiguration);
+                EmailMessage email = new EmailMessage();
+                email.Content = msg.answer;
+                email.FromAddress = new EmailAddress() { Name = "EpidemyTracker Admin", Address = "epidemytracker@gmail.com" };
+                email.ToAddress = new EmailAddress() { Name = msg.Name.Trim(), Address = msg.Email.Trim() };
+                email.Subject = msg.subject + " - Answer";
+                emailService.Send(email);
+                await _dataContext.SaveChangesAsync();
+                TempData["messageCheck"] = "External message answered successfully";
+            } else
+            {
+                TempData["messageCheck"] = "fail";
+            }
+
             return RedirectToAction("Messages", "Admin");
         }
     }

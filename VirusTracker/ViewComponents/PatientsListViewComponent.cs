@@ -12,14 +12,10 @@ namespace VirusTracker.ViewComponents
     public class PatientsListViewComponent : ViewComponent
     {
         private readonly VirusTrackerContext _dataContext;
-        private readonly UserManager<Doctor> _userManager;
-        private readonly SignInManager<Doctor> _signInManager;
 
 
-        public PatientsListViewComponent(UserManager<Doctor> userManager, SignInManager<Doctor> signInManager, VirusTrackerContext dataContext)
+        public PatientsListViewComponent(VirusTrackerContext dataContext)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _dataContext = dataContext;
         }
         public async Task<IViewComponentResult> InvokeAsync(string doctorId)
