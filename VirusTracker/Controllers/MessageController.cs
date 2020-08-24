@@ -50,6 +50,7 @@ namespace VirusTracker.Controllers
             msg.type = data["type"];
             _dataContext.Message.Add(msg);
             await _dataContext.SaveChangesAsync();
+            TempData["sendMessageCheck"] = "success";
             return RedirectToAction("Index", new { doctorId = data["doctorId"].ToString()});
         }
 

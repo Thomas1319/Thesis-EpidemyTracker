@@ -109,16 +109,32 @@ namespace VirusTracker.Controllers
         public async Task<IActionResult> RemoveFromDoctor(string patientId, string docId)
         {
             var patient = _dataContext.Patient.ToList().Find(p => p.ID.ToString() == patientId);
-            patient.doctorId = null;
-            await _dataContext.SaveChangesAsync();
+            if (patient != null)
+            {
+                patient.doctorId = null;
+                await _dataContext.SaveChangesAsync();
+                TempData["removeDoctorCheck"] = "success";
+            }
+            else
+            {
+                TempData["removeDoctorCheck"] = "fail";
+            }
             return RedirectToAction("EditDoctor", new { doctorId = docId });
         }
 
         public async Task<IActionResult> RemoveFromPatient(string patId)
         {
             var patient = _dataContext.Patient.ToList().Find(p => p.ID.ToString() == patId);
-            patient.doctorId = null;
-            await _dataContext.SaveChangesAsync();
+            if(patient != null)
+            {
+                patient.doctorId = null;
+                await _dataContext.SaveChangesAsync();
+                TempData["removePatientCheck"] = "success";
+            } else
+            {
+                TempData["removePatientCheck"] = "fail";
+            }
+
             return RedirectToAction("EditPatient", new { patientId = patId });
         }
 
@@ -127,13 +143,21 @@ namespace VirusTracker.Controllers
         {
             //System.Diagnostics.Debug.WriteLine(formdata["fname"].ToString());
             var doctor = _userManager.Users.ToList().Find(d => d.Id == formdata["id"]);
-            doctor.firstName = formdata["fname"];
-            doctor.lastName = formdata["lname"];
-            doctor.UserName = formdata["username"];
-            doctor.password = formdata["password"];
-            doctor.Email = formdata["email"];
-            doctor.PhoneNumber = formdata["phone"];
-            await _dataContext.SaveChangesAsync();
+            if(doctor != null)
+            {
+                doctor.firstName = formdata["fname"];
+                doctor.lastName = formdata["lname"];
+                doctor.UserName = formdata["username"];
+                doctor.password = formdata["password"];
+                doctor.Email = formdata["email"];
+                doctor.PhoneNumber = formdata["phone"];
+                await _dataContext.SaveChangesAsync();
+                TempData["editDoctorCheck"] = doctor.firstName + " " + doctor.lastName;
+            } else
+            {
+                TempData["editDoctorCheck"] = "fail";
+            }
+            
             return RedirectToAction("EditDoctor", new { doctorId = formdata["id"] });
         }
 
@@ -142,17 +166,26 @@ namespace VirusTracker.Controllers
         {
             //System.Diagnostics.Debug.WriteLine(formdata["id"].ToString());
             var patient = _dataContext.Patient.ToList().Find(p => p.ID.ToString() == formdata["id"]);
-            patient.firstName = formdata["fname"];
-            patient.lastName = formdata["lname"];
-            patient.address = formdata["address"];
-            patient.age = Int32.Parse(formdata["age"]);
-            patient.emailAddress = formdata["email"];
-            patient.phoneNumber = formdata["phone"];
-            patient.weight = Int32.Parse(formdata["weight"]);
-            patient.height = Int32.Parse(formdata["height"]);
-            patient.symptoms = formdata["symptoms"];
-            patient.treatment = formdata["treatment"];
-            await _dataContext.SaveChangesAsync();
+            if(patient != null)
+            {
+                    patient.firstName = formdata["fname"];
+                patient.lastName = formdata["lname"];
+                patient.address = formdata["address"];
+                patient.age = Int32.Parse(formdata["age"]);
+                patient.emailAddress = formdata["email"];
+                patient.phoneNumber = formdata["phone"];
+                patient.weight = Int32.Parse(formdata["weight"]);
+                patient.height = Int32.Parse(formdata["height"]);
+                patient.symptoms = formdata["symptoms"];
+                patient.treatment = formdata["treatment"];
+                await _dataContext.SaveChangesAsync();
+                TempData["editPatientCheck"] = patient.firstName + " " + patient.lastName;
+            }
+            else
+            {
+                TempData["editPatientCheck"] = "fail";
+            }
+
             return RedirectToAction("EditPatient", new { patientId = formdata["id"] });
         }
 
@@ -177,8 +210,7 @@ namespace VirusTracker.Controllers
         public async Task<IActionResult> AnswerMessage(int messageId, string answer)
         {
             var x = _dataContext.Message.Find(messageId);
-            
-
+           
             return RedirectToAction("Messages");
         }
         public async Task<IActionResult> RemoveMessage(int messageId)

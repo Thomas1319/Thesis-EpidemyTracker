@@ -6,7 +6,7 @@
     var modelSave = Model.Patient;
     var searchCheck = TempData.Peek("searchCheck");
 }
-    <script>
+<script>
     //scroll to the DIV the reloaded the page TO DO
     window.onload = function () {
         var obj = document.getElementById("scrollable");
@@ -57,23 +57,130 @@
         div.appendChild(i);
         div.appendChild(s2);
         div.appendChild(btn);
-        
+
         document.getElementById("symptomsContainer").appendChild(div);
-        }
+    }
 
     function removeSymptom(index) {
         var par = document.getElementById("symptomsContainer")
         var x = document.getElementById("symptom " + index);
         par.removeChild(x);
-        }
-        function toggleCreate() {
-            var x = document.getElementById("extra");
-            if (x.style.display === "none")
-                x.style.display = "block";
-            else
-                x.style.display = "none";
-        }
-    </script>
+    }
+    function toggleCreate() {
+        var x = document.getElementById("extra");
+        if (x.style.display === "none")
+            x.style.display = "block";
+        else
+            x.style.display = "none";
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $('#toFade').delay(3000).fadeOut();
+    });
+</script>
+@if (TempData["sendMessagePatient"] != "fail" && TempData["sendMessagePatient"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Message sent successfully
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["sendMessagePatient"] == "fail")
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["updateDataPatient"] != "fail" && TempData["updateDataPatient"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        A new treatment entry has been created successfully
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["updateDataPatient"] == "fail")
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["deleteDataPatient"] != "fail" && TempData["deleteDataPatient"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        The treatment entry has been deleted successfully
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["deleteDataPatient"] == "fail")
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["startQuarantinePatient"] != "fail" && TempData["startQuarantinePatient"] != null)
+{
+<div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+    Patient's quaratine has started and will end on @TempData["startQuarantinePatient"]
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+}
+else if (TempData["startQuarantinePatient"] == "fail")
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["stopQuarantinePatient"] != "fail" && TempData["stopQuarantinePatient"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        The quarantine has been stopped successfully
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["stopQuarantinePatient"] == "fail")
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+
 <!--Patient data section-->
 <div>
     <div class="card mt-3 mb-3">
@@ -87,7 +194,7 @@
             </ul>
         </div>
     </div>
-    
+
 
     <div class="card mt-3 mb-3">
         <h2 class="card-title">Medical Info</h2>
@@ -104,13 +211,17 @@
             <p class="card-text">@Model.Patient.additionalComments</p>
         </div>
         <ul class="list-inline">
-            @for(int i = 0; i < Model.Documents; i++)
+            @if (Model.Documents > 0)
             {
-                <li class="list-inline-item">
-                    <a href="@Url.Action("GetDocument", "HandlePatient", new{number = i, id = Model.Patient.ID})"><i class="material-icons">description</i></a>
-                </li>
+                for (int i = 0; i < Model.Documents; i++)
+                {
+                    <li class="list-inline-item">
+                        <a href="@Url.Action("GetDocument", "HandlePatient", new{number = i, id = Model.Patient.ID})"><i class="material-icons">description</i></a>
+                    </li>
+                }
             }
-            
+
+
         </ul>
     </div>
 
@@ -214,7 +325,7 @@
                                     }
                                     <button type="button" id="extra" class="text-success btn" onclick="createSymptom(@i); toggleCreate()"><i class="material-icons">add</i></button>
                                 </div>
-                               
+
 
                             }
                         </div>
@@ -223,7 +334,7 @@
                     <button class="btn btn-danger" type="button" onclick="location.href=' @Url.Action("DeleteUpdate", new { id = lastUpdate.Id, patientId = Model.Patient.ID }) '">Remove Update</button>
 
                 </div>
-                for (int j = 1; j < Model.Updates.Count-1; j++)
+                for (int j = 1; j < Model.Updates.Count - 1; j++)
                 {
                     <div id="tab-@j" style="display:none">
                         <div class="card-group">
@@ -272,11 +383,11 @@
             else
             {
                 <div class="card-text">Patient did not need quaratine</div>
-                <form asp-action="StartQuarantine" >
+                <form asp-action="StartQuarantine">
                     <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
                     <div class="form-group">
                         <label for="date">Select length of quarantine(days):</label>
-                        <input type="number" max="31" min="1" name="days" id="days" class="form-control"/>
+                        <input type="number" max="31" min="1" name="days" id="days" class="form-control" />
                         <input class="btn btn-success list-group-item" type="submit" value="Start quarantine" />
                     </div>
                 </form>
@@ -306,7 +417,7 @@
                 </form>
             </div>
         </div>
-        
+
         <div class="card-body">
             <div class="row">
                 <div class="col-6" style="overflow:scroll; max-height:300px;" id="scrollable">
@@ -355,9 +466,9 @@
         </div>
     </div>
 
-        
-    </div>
-    
+
+</div>
+
 
 
 

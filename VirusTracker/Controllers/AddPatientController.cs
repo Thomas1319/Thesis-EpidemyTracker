@@ -41,45 +41,54 @@ namespace VirusTracker.Controllers
             var doctor = await _userManager.GetUserAsync(User);
             System.Diagnostics.Debug.WriteLine(doctor.Id + " " + doctor.UserName);
             var foundPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == patient.ID.ToString());
-            foundPatient.treatment = patient.treatment;
-            foundPatient.treatmentComments = patient.treatmentComments;
-            foundPatient.doctorId = doctor.Id.ToString();
-            if(!patient.treatment.Equals("See a general practitioner"))
-                foundPatient.quarantineEndDate = DateTime.Now.AddDays(14);
+            if(doctor != null && foundPatient != null)
+            {
+                foundPatient.treatment = patient.treatment;
+                foundPatient.treatmentComments = patient.treatmentComments;
+                foundPatient.doctorId = doctor.Id.ToString();
+                if (!patient.treatment.Equals("See a general practitioner"))
+                    foundPatient.quarantineEndDate = DateTime.Now.AddDays(14);
 
+
+                EmailMessage emailMessage = new EmailMessage();
+                EmailAddress from = new EmailAddress();
+                from.Name = doctor.firstName + " " + doctor.lastName;
+                from.Address = doctor.Email.Trim();
+
+                EmailAddress to = new EmailAddress();
+                to.Name = foundPatient.firstName + " " + foundPatient.lastName;
+                to.Address = foundPatient.emailAddress.Trim();
+
+                emailMessage.ToAddress = to;
+                emailMessage.FromAddress = from;
+                emailMessage.Subject = "Epidemy tracker response - " + foundPatient.treatment;
+                emailMessage.Content = foundPatient.treatmentComments;
+                if (foundPatient.quarantineEndDate > DateTime.Now)
+                    emailMessage.Content += "\n You should be in quaratine at least until: " + foundPatient.quarantineEndDate.ToString();
+
+                var newEmail = new EmailsModel();
+                newEmail.doctorId = doctor.Id;
+                newEmail.patientId = foundPatient.ID.ToString();
+                newEmail.fromAddress = doctor.Email.Trim();
+                newEmail.toAddress = foundPatient.emailAddress.Trim();
+                newEmail.content = emailMessage.Content;
+                newEmail.date = DateTime.UtcNow;
+                newEmail.subject = "Epidemy tracker response";
+                _dataContext.Emails.Add(newEmail);
+                await _dataContext.SaveChangesAsync();
+
+                foundPatient.messages += newEmail.Id.ToString() + ",";
+                await _dataContext.SaveChangesAsync();
+
+                EmailService emailService = new EmailService(_emailConfiguration);
+                emailService.AnswerPatient(emailMessage, foundPatient, doctor);
+
+                TempData["addPatientCheck"] = foundPatient.firstName + " " + foundPatient.lastName;
+            } else
+            {
+                TempData["addPatientCheck"] = "fail";
+            }
             
-            EmailMessage emailMessage = new EmailMessage();
-            EmailAddress from = new EmailAddress();
-            from.Name = doctor.firstName + " " + doctor.lastName;
-            from.Address = doctor.Email.Trim();
-
-            EmailAddress to = new EmailAddress();
-            to.Name = foundPatient.firstName + " " + foundPatient.lastName;
-            to.Address = foundPatient.emailAddress.Trim();
-
-            emailMessage.ToAddress = to;
-            emailMessage.FromAddress = from;
-            emailMessage.Subject = "Epidemy tracker response - " + foundPatient.treatment;
-            emailMessage.Content = foundPatient.treatmentComments;
-            if (foundPatient.quarantineEndDate > DateTime.Now)
-                emailMessage.Content += "\n You should be in quaratine at least until: " + foundPatient.quarantineEndDate.ToString();
-
-            var newEmail = new EmailsModel();
-            newEmail.doctorId = doctor.Id;
-            newEmail.patientId = foundPatient.ID.ToString();
-            newEmail.fromAddress = doctor.Email.Trim();
-            newEmail.toAddress = foundPatient.emailAddress.Trim();
-            newEmail.content = emailMessage.Content;
-            newEmail.date = DateTime.UtcNow;
-            newEmail.subject = "Epidemy tracker response";
-            _dataContext.Emails.Add(newEmail);
-            await _dataContext.SaveChangesAsync();
-
-            foundPatient.messages += newEmail.Id.ToString() + ",";
-            await _dataContext.SaveChangesAsync();
-
-            EmailService emailService = new EmailService(_emailConfiguration);
-            emailService.AnswerPatient(emailMessage, foundPatient, doctor);
        
             return RedirectToAction("Index", "Dashboard");
         }

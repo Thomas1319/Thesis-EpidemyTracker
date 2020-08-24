@@ -80,8 +80,16 @@ namespace VirusTracker.Controllers
                 mymodel.Updates = null;
             }
             mymodel.Patient = currentPatient;
-           // mymodel.Messages = messages;
-            mymodel.Documents = Directory.GetFiles(path).ToList().Count;
+            // mymodel.Messages = messages;
+            int files = 0;
+            try
+            {
+                files = Directory.GetFiles(path).ToList().Count;
+            } catch(Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("no files");
+            }
+            mymodel.Documents = files;
             TempData["doctorId"] = doctor.Id;
             if (!String.IsNullOrEmpty(searchString))
             {
@@ -104,7 +112,7 @@ namespace VirusTracker.Controllers
         {
             var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == patientId);
             var doctor = await _userManager.GetUserAsync(User);
-            if(message != null)
+            if(message != null && currentPatient != null && doctor != null)
             {
                 EmailMessage emailMessage = new EmailMessage();
                 EmailAddress from = new EmailAddress();
@@ -135,8 +143,13 @@ namespace VirusTracker.Controllers
 
                 EmailService emailService = new EmailService(_emailConfiguration);
                 emailService.AnswerPatient(emailMessage, currentPatient, doctor);
+                TempData["sendMessagePatient"] = "success";
+            } else
+            {
+                TempData["sendMessagePatient"] = "fail";
+
             }
-            
+
 
             return RedirectToAction("Index", new {id = patientId });
 
@@ -146,12 +159,12 @@ namespace VirusTracker.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUpdate(IFormCollection data)
         {
-            System.Diagnostics.Debug.WriteLine("0");
+            //System.Diagnostics.Debug.WriteLine("0");
             var allUpdates = _dataContext.PatientUpdates.Where(u => u.patientId.ToString() == data["patientId"].ToString()).ToList();
             var patient = _dataContext.Patient.First<Patient>(p => p.ID == Int32.Parse(data["patientId"]));
             var update = new PatientUpdateModel();
-            System.Diagnostics.Debug.WriteLine("1");
-            System.Diagnostics.Debug.WriteLine(data["nbSymp"]);
+            //System.Diagnostics.Debug.WriteLine("1");
+            //System.Diagnostics.Debug.WriteLine(data["nbSymp"]);
             var currSympBuilder = "";
             update.patientId = Int32.Parse(data["patientId"]);
             update.timestamp = DateTime.Parse(data["timestamp"]);
@@ -162,7 +175,7 @@ namespace VirusTracker.Controllers
             {
                 if(data["currSymptom " + i].ToString().Trim() != "")
                     currSympBuilder += data["currSymptom " + i].ToString().Trim() + ":" + data["currComment " + i].ToString().Trim() + ",";
-                System.Diagnostics.Debug.WriteLine(currSympBuilder);
+                //System.Diagnostics.Debug.WriteLine(currSympBuilder);
             }
                     
             if(currSympBuilder.Length > 0)
@@ -180,27 +193,35 @@ namespace VirusTracker.Controllers
                                 ((update.currentSymptoms == patient.symptoms.Trim()
                                 && update.currentTreatment == patient.treatment.Trim() && update.currentTreatmentComments == patient.treatmentComments.Trim())) == false)
             {
-                System.Diagnostics.Debug.WriteLine("2");
+                //System.Diagnostics.Debug.WriteLine("2");
 
                 _dataContext.PatientUpdates.Add(update);
                 await _dataContext.SaveChangesAsync();
-                return RedirectToAction("Index", new { id = data["patientId"] });
+                TempData["updateDataPatient"] = "success";
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("3");
-
-                System.Diagnostics.Debug.WriteLine("Nothing changed");
-                return RedirectToAction("Index", new { id = data["patientId"] });
+                TempData["updateDataPatient"] = "fail";
             }
+       
+            return RedirectToAction("Index", new { id = data["patientId"] });
         }
 
         public async Task<IActionResult> DeleteUpdate(string id, string patientId)
         {
-            System.Diagnostics.Debug.WriteLine("IN DELETE" + id);
+            //System.Diagnostics.Debug.WriteLine("IN DELETE" + id);
             var toDelete = _dataContext.PatientUpdates.First(u => u.Id.ToString() == id);
-            _dataContext.PatientUpdates.Remove(toDelete);
-            await _dataContext.SaveChangesAsync();
+            if(toDelete != null)
+            {
+                _dataContext.PatientUpdates.Remove(toDelete);
+                await _dataContext.SaveChangesAsync();
+                TempData["deleteDataPatient"] = "success";
+            }
+            else
+            {
+                TempData["deleteDataPatient"] = "fail";
+            }
+
             return RedirectToAction("Index", new { id = patientId });
             
         }
@@ -209,9 +230,18 @@ namespace VirusTracker.Controllers
         public async Task<IActionResult> StartQuarantine(IFormCollection data)
         {
             var currentPatient = _dataContext.Patient.First(p => p.ID.ToString() == data["patientId"].ToString());
-            System.Diagnostics.Debug.WriteLine(data["days"]);
-            currentPatient.quarantineEndDate = DateTime.UtcNow.AddDays(Double.Parse(data["days"].ToString()));
-            await _dataContext.SaveChangesAsync();
+           // System.Diagnostics.Debug.WriteLine(data["days"]);
+           if(currentPatient != null)
+            {
+                currentPatient.quarantineEndDate = DateTime.UtcNow.AddDays(Double.Parse(data["days"].ToString()));
+                await _dataContext.SaveChangesAsync();
+                TempData["startQuarantinePatient"] = currentPatient.quarantineEndDate.ToString();
+            }
+            else
+            {
+                TempData["startQuarantinePatient"] = "fail";
+            }
+
 
             return RedirectToAction("Index", new { id = data["patientId"] });
         }
@@ -220,8 +250,17 @@ namespace VirusTracker.Controllers
         public async Task<IActionResult> StopQuarantine(string patientId)
         {
             var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == patientId);
-            currentPatient.quarantineEndDate = DateTime.Parse("13/02/1999 00:00:00");
-            await _dataContext.SaveChangesAsync();
+            if(currentPatient != null)
+            {
+                currentPatient.quarantineEndDate = DateTime.Parse("13/02/1999 00:00:00");
+                await _dataContext.SaveChangesAsync();
+                TempData["stopQuarantinePatient"] = "success";
+            }
+            else
+            {
+                TempData["stopQuarantinePatient"] = "fail";
+            }
+
 
             return RedirectToAction("Index", new { id = patientId });
         }

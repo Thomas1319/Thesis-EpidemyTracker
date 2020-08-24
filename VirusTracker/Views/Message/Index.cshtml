@@ -3,62 +3,87 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutLoggedin.cshtml";
 }
-    <div>
-        <h4>Send a message</h4>
-        <form asp-action="SendMessage" method="post">
-            <input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
-            <input type="hidden" name="type" value="internal" />
-            <input type="hidden" name="name" value="@Model.Doctor.firstName @Model.Doctor.lastName" />
-            <input type="hidden" name="email" value="@Model.Doctor.Email" />
-            <input type="hidden" name="date" value="@DateTime.UtcNow" />
-            <div class="form-group">
-                <input type="text" class="form-control" name="subject" placeholder="Subject" required />
-            </div>
-            <div class="form-group">
-                <textarea class="form-control" name="message" placeholder="Write your message here..." required></textarea>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-info" type="submit" >Send</button>
-            </div>
+    <script>
+    $(document).ready(function () {
+        $('#toFade').delay(3000).fadeOut();
+    });
+    </script>
+@if (TempData["sendMessageCheck"] != "fail" && TempData["sendMessageCheck"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your message has been sent successfully
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["sendMessageCheck"] == "fail")
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+        Your requests did not go through.
+        <hr />
+        Please check it again!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+<div>
+    <h4>Send a message</h4>
+    <form asp-action="SendMessage" method="post">
+        <input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
+        <input type="hidden" name="type" value="internal" />
+        <input type="hidden" name="name" value="@Model.Doctor.firstName @Model.Doctor.lastName" />
+        <input type="hidden" name="email" value="@Model.Doctor.Email" />
+        <input type="hidden" name="date" value="@DateTime.UtcNow" />
+        <div class="form-group">
+            <input type="text" class="form-control" name="subject" placeholder="Subject" required />
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" name="message" placeholder="Write your message here..." required></textarea>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-info" type="submit">Send</button>
+        </div>
 
-        </form>
-        @if (Model.Messages.Count != 0)
+    </form>
+    @if (Model.Messages.Count != 0)
+    {
+        <hr />
+
+        <h4>Previous messages</h4>
+        @foreach (var m in Model.Messages)
         {
-            <hr />
-
-            <h4>Previous messages</h4>
-            @foreach (var m in Model.Messages)
-            {
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-group">
-                            <p class="card-title">@m.subject</p>
-                            <p class="card-text">@m.timestamp</p>
-                            @if (m.answer == null)
-                            {
-                                <i class="text-danger material-icons">cancel</i>
-                            }
-                            else
-                            {
-                                <i class="text-success material-icons">check_circle</i>
-                            }
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-group">
-                            <p class="card-title">Your message:</p>
-                            <p class="card-text">@m.messageContent</p>
-                        </div>
-                        @if (m.answer != null)
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-group">
+                        <p class="card-title">@m.subject</p>
+                        <p class="card-text">@m.timestamp</p>
+                        @if (m.answer == null)
                         {
-                            <div class="card-group">
-                                <p class="card-title">Answer:</p>
-                                <p class="card-text">@m.answer</p>
-                            </div>
+                            <i class="text-danger material-icons">cancel</i>
+                        }
+                        else
+                        {
+                            <i class="text-success material-icons">check_circle</i>
                         }
                     </div>
                 </div>
-            }
+                <div class="card-body">
+                    <div class="card-group">
+                        <p class="card-title">Your message:</p>
+                        <p class="card-text">@m.messageContent</p>
+                    </div>
+                    @if (m.answer != null)
+                    {
+                        <div class="card-group">
+                            <p class="card-title">Answer:</p>
+                            <p class="card-text">@m.answer</p>
+                        </div>
+                    }
+                </div>
+            </div>
         }
+    }
 
-    </div>
+</div>
