@@ -50,9 +50,13 @@ namespace VirusTracker.Controllers
         public IActionResult Register()
         {
 
-            DataSeeder data = new DataSeeder(_context);
+            // DataSeeder data = new DataSeeder(_context);
             //data.Seed(200);
             //_context.SaveChanges();
+            var res = new PythonManager();
+            //res.Run();
+            System.Diagnostics.Debug.WriteLine(res.Run());
+           // System.Diagnostics.Debug.WriteLine(output);
             return View();
         }
 

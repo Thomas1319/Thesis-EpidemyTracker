@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusTracker\\VirusTracker.csproj": {}
+    "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusTracker\\VirusTracker.csproj": {}
   },
   "projects": {
-    "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusTracker\\VirusTracker.csproj": {
+    "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusTracker\\VirusTracker.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusTracker\\VirusTracker.csproj",
+        "projectUniqueName": "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusTracker\\VirusTracker.csproj",
         "projectName": "VirusTracker",
-        "projectPath": "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusTracker\\VirusTracker.csproj",
+        "projectPath": "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusTracker\\VirusTracker.csproj",
         "packagesPath": "C:\\Users\\Thomas\\.nuget\\packages\\",
-        "outputPath": "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusTracker\\obj\\",
+        "outputPath": "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusTracker\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Thomas\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -38,6 +38,18 @@
       "frameworks": {
         "netcoreapp3.1": {
           "dependencies": {
+            "IronPython": {
+              "target": "Package",
+              "version": "[2.7.10, )"
+            },
+            "IronPython.Interpreter": {
+              "target": "Package",
+              "version": "[2.7.4, )"
+            },
+            "IronPython.StdLib": {
+              "target": "Package",
+              "version": "[2.7.10, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[2.7.0, )"
@@ -79,6 +91,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[3.1.4, )"
+            },
+            "NltkNet": {
+              "target": "Package",
+              "version": "[1.0.13, )"
             }
           },
           "imports": [
