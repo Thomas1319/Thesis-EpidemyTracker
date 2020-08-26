@@ -49,14 +49,54 @@ namespace VirusTracker.Controllers
 
             EmailService emailService = new EmailService(_emailConfiguration); //MAYBE MOVE THIS SOMEWHERE ELSE
             var emails = emailService.ReceiveEmail(currentPatient, doctor);
+            var allSentiment = _dataContext.Sentiment.Where(s => s.patientId == currentPatient.ID).ToList();
+            if (allSentiment.Count == 0)
+            {
+                SentimentModel sentiment = new SentimentModel();
+                sentiment.patientId = currentPatient.ID;
+                sentiment.sentiment = 5.0;
+                sentiment.timestamp = DateTime.UtcNow;
+                _dataContext.Sentiment.Add(sentiment);
+                await _dataContext.SaveChangesAsync();
+                System.Diagnostics.Debug.WriteLine("Created default sentiment");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine(allSentiment.FirstOrDefault().sentiment);
+
+            }
             if (emails.Count > 0)
             {
-                foreach(var e in emails)
+                PythonManager pm = new PythonManager();
+                foreach (var e in emails)
                 {
+                    var result = pm.PredictSentiment(Environment.CurrentDirectory + "/PythonScripts/predict_text.py", e.content);
+                    var splitResult = result.Split("\n");
+                    var computedSent = 0.0;
+                    System.Diagnostics.Debug.WriteLine(splitResult[1]);
+                    System.Diagnostics.Debug.WriteLine(Double.Parse(splitResult[1]).ToString());
+                    System.Diagnostics.Debug.WriteLine((Double.Parse(splitResult[1])/100).ToString());
+                    if (splitResult[0].Contains("Negative"))
+                        computedSent = allSentiment.Last().sentiment - 0.75 * Double.Parse(splitResult[1]) / 1000;
+                    else
+                        computedSent = allSentiment.Last().sentiment + 0.75 * Double.Parse(splitResult[1]) / 1000;
+                    if (computedSent < 0)
+                        computedSent = 0;
+                    if (computedSent > 10)
+                        computedSent = 10;
+                    System.Diagnostics.Debug.WriteLine(result);
+                    SentimentModel sent = new SentimentModel();
+                    sent.patientId = currentPatient.ID;
+                    sent.timestamp = DateTime.UtcNow;
+                    sent.sentiment = computedSent;
+                    _dataContext.Sentiment.Add(sent);
+
+
                     _dataContext.Emails.Add(e);
                     await _dataContext.SaveChangesAsync();
                     _dataContext.Patient.First(p => p.ID == currentPatient.ID).messages += e.Id + ",";
                 }
+                
             }
             await _dataContext.SaveChangesAsync();
             var emailsId = currentPatient.messages.Split(",").ToList();
@@ -65,8 +105,11 @@ namespace VirusTracker.Controllers
             //var emails = _dataContext.Emails.Where(e => emailsId.Contains(e.Id.ToString())).ToList();
             //emails.OrderBy(d => d.date).ToList();
 
+            var current_sent = _dataContext.Sentiment.Where(s => s.patientId == currentPatient.ID).ToList().Last().sentiment;
+
 
             dynamic mymodel = new ExpandoObject();
+            mymodel.Sentiment = current_sent;
             var updates = _dataContext.PatientUpdates.Where(u => u.patientId == currentPatient.ID).ToList();
             if (updates.Count > 0)
             {
@@ -80,7 +123,8 @@ namespace VirusTracker.Controllers
                 mymodel.Updates = null;
             }
             mymodel.Patient = currentPatient;
-            // mymodel.Messages = messages;
+
+
             int files = 0;
             try
             {

@@ -17,20 +17,6 @@ from nltk.tag import pos_tag
 from statistics import mode
 import pickle
 
-
-tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
-pos = open('twitter_samples/positive_tweets.json', 'r').read()
-neg = open('twitter_samples/negative_tweets.json', 'r').read()
-
-pos_new = open('twitter_samples/pos_trimmed.txt', 'r').read()
-neg_new = open('twitter_samples/neg_trimmed.txt', 'r').read()
-
-#text = twitter_samples('tweets.20150430-223406.json')
-tokenized_pos = line_tokenize(pos)
-tokenized_neg = line_tokenize(neg)
-
-stop_words = stopwords.words('english')
-
 class VoteClassifier(ClassifierI):
     def __init__(self, *classifiers):
         self._classifiers = classifiers
@@ -51,6 +37,21 @@ class VoteClassifier(ClassifierI):
         choice_votes = votes.count(mode(votes))
         conf = choice_votes / len(votes) * 100
         return conf
+
+tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
+#pos = open('twitter_samples/positive_tweets.json', 'r').read()
+#neg = open('twitter_samples/negative_tweets.json', 'r').read()
+
+pos_new = open('twitter_samples\pos_trimmed.txt', 'r').read()
+neg_new = open('twitter_samples\neg_trimmed.txt', 'r').read()
+
+#text = twitter_samples('tweets.20150430-223406.json')
+tokenized_pos = line_tokenize(pos)
+tokenized_neg = line_tokenize(neg)
+
+stop_words = stopwords.words('english')
+
+
 
 
 

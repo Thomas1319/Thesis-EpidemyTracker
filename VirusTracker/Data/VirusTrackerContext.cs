@@ -23,5 +23,6 @@ namespace VirusTracker.Data
         public DbSet<VirusTracker.Models.EnrollModel> Enroll { get; set; }
         public DbSet<VirusTracker.Models.EmailsModel> Emails { get; set; }
         public DbSet<VirusTracker.Models.PatientUpdateModel> PatientUpdates { get; set; }
+        public DbSet<VirusTracker.Models.SentimentModel> Sentiment { get; set; }
     }
 }

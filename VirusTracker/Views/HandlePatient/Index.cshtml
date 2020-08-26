@@ -449,6 +449,37 @@ else if (TempData["stopQuarantinePatient"] == "fail")
                     }
                 </div>
                 <div class="col-6">
+                    @if(Model.Sentiment != null){
+                        double sentiment = Model.Sentiment * 10;
+                        <div class="d-inline">
+                            <p>Patient's unrest level:<p class="text-danger">Panicked</p> <p class="text-secondary">Uneasy</p> <p class="text-primary">Neutral</p> <p class="text-success">Relaxed</p></p>
+                        </div>
+                        if (sentiment <= 15)
+                        {
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        }
+                        else if (sentiment > 15 && sentiment <= 35)
+                        {
+                            <div class="progress">
+                                <div class="progress-bar bg-secondary" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        }
+                        else if (sentiment > 35 && sentiment <= 60)
+                        {
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        }
+                    }
+
                     <form asp-action="SendMessage">
                         <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
 
@@ -460,7 +491,7 @@ else if (TempData["stopQuarantinePatient"] == "fail")
                         </div>
                     </form>
                 </div>
-            </div>
+                        </div>
 
 
         </div>

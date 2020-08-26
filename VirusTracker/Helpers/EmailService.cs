@@ -38,11 +38,16 @@ namespace VirusTracker.Helpers
             foreach(var l in array)
             {
                 if(l != null && l.Length > 0)
-                    if (l[0] != '>' && (l.Contains(" <" + patient.emailAddress.Trim() + "> ") == false && l.Contains(doctor.firstName.Trim() + " " + doctor.lastName.Trim() + " <epidemytracker@gmail.com>") == false))
+                    if (l[0] != '>' && (l.Contains(" <" + patient.emailAddress.Trim() + "> ") == false && l.Contains(doctor.firstName.Trim() + " " + doctor.lastName.Trim() + " <epidemytracker@gmail.com>") == false)
+                        && l.Contains("www.") == false && l.Contains("Trimis din Yahoo") == false && l.Contains("Sent from Yahoo") == false)
                     {
                         System.Diagnostics.Debug.WriteLine(l);
 
                         format += l + "\n";
+                    }
+                    else
+                    {
+                        break;
                     }
                         
             }

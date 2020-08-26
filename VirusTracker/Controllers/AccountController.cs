@@ -53,10 +53,8 @@ namespace VirusTracker.Controllers
             // DataSeeder data = new DataSeeder(_context);
             //data.Seed(200);
             //_context.SaveChanges();
-            var res = new PythonManager();
-            //res.Run();
-            System.Diagnostics.Debug.WriteLine(res.Run());
-           // System.Diagnostics.Debug.WriteLine(output);
+            //var res = new PythonManager();
+            //System.Diagnostics.Debug.WriteLine(res.Run(@"D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\PythonScripts\predict_text.py", "My life is miserable but i love dogs"));
             return View();
         }
 
