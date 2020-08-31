@@ -14,13 +14,15 @@ namespace VirusTracker.Models
         public int doctorId { get; set; }*/
 
 
-        [Required]
-        [StringLength(50, MinimumLength = 3)]
+        [Required(ErrorMessage = "First name cannot be empty")]
+        [StringLength(40, MinimumLength = 2)]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "This field accepts only upper and lower case letters.")]
         public string firstName { get; set; }
 
 
-        [Required]
-        [StringLength(50, MinimumLength = 3)]
+        [Required(ErrorMessage = "Last name cannot be empty")]
+        [StringLength(20, MinimumLength = 3)]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "This field accepts only upper and lower case letters.")]
         public string lastName { get; set; }
 
 
@@ -36,8 +38,8 @@ namespace VirusTracker.Models
         public string emailAddress { get; set; }*/
 
 
-        [Required]
-        [StringLength(60, MinimumLength = 3)]
+        [Required(ErrorMessage ="Password cannot be empty")]
+        [StringLength(60, MinimumLength = 3, ErrorMessage = "Invalid length")]
         public string password { get; set; }
 
         public ICollection<Patient> patients { get; set; }

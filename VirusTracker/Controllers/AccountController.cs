@@ -94,15 +94,25 @@ namespace VirusTracker.Controllers
                             return RedirectToAction("Index", "Dashboard");
                         }
                         else
-                            System.Diagnostics.Debug.WriteLine("sad register");
+                        {
+                            TempData["registerResult"] = "Sorry, we couldn't log you in";
+                            return View("Register");
+                        }
                     }
-                    System.Diagnostics.Debug.WriteLine("sad create");
-                } else {
-                    System.Diagnostics.Debug.WriteLine("Code invalid or taken");
+                    TempData["registerResult"] = "Sorry, we couldn't create your account.";
+                    return View("Register");
+
                 }
+                else {
+                    TempData["registerResult"] = "Your data is invalid";
+                    return View("Register");
+
+                }
+            } else
+            {
+                TempData["registerResult"] = "The code has been taken or is invalid";
+                return View("Register");
             }
-                
-            return RedirectToAction("Register");
         }
 
         
@@ -124,48 +134,61 @@ namespace VirusTracker.Controllers
                 if (res.Succeeded)
                 {
                     var x = await _userManager.IsInRoleAsync(user, "Administrator");
-                    if(x == true)
+                    if (x == true)
                         return RedirectToAction("Index", "Admin");
                     else
                         return RedirectToAction("Index", "Dashboard");
                 }
                 else
-                    System.Diagnostics.Debug.WriteLine("sad login");
-                System.Diagnostics.Debug.WriteLine("found user");
+                {
+                    TempData["loginResult"] = "Sorry, your login request has been denied";
+                    return View("Login");
+                }
+            } else
+            {
+                TempData["loginResult"] = "Sorry, the username and password that you provided are invalid";
+                return View("Login");
             }
-            return RedirectToAction("Login");
         }
         [HttpPost]
         public async Task<IActionResult> Enroll(EnrollModel model, IFormFile CV, IFormFile Letter)
         {
             if (!ModelState.IsValid)
             {
-                System.Diagnostics.Debug.WriteLine("Bad model");
+                TempData["enrollResult"] = "Sorry, the data that you provided is not valid";
                 return View("Enroll");
             }
             long size = CV.Length + Letter.Length;
-            System.Diagnostics.Debug.WriteLine(size.ToString() + " " + _sizeLimit.ToString());
+            //System.Diagnostics.Debug.WriteLine(size.ToString() + " " + _sizeLimit.ToString());
+            if(size == 0)
+            {
+                TempData["enrollResult"] = "Please add you CV and Motivation Letter";
+                return View("Enroll");
+            }
             if (size <= _sizeLimit)
             {
                 if (!Directory.Exists(_filePath + "/" + model.Id + "_" + model.firstName + "_" + model.lastName))
                 {
                     _context.Enroll.Add(model);
                     await _context.SaveChangesAsync();
-                    var ok = 0;
                     Directory.CreateDirectory(_filePath + "/" + model.Id + "_" + model.firstName + "_" + model.lastName);
                     if (CV.Length > 0 && fileTypes.FirstOrDefault(x => x.Value == CV.ContentType).Key != null)
                     {
-                        var filePath = Path.Combine(_filePath + "/"  + model.Id + "_" + model.firstName + "_" + model.lastName, model.firstName + "_" + model.lastName + "_CV" + fileTypes.FirstOrDefault(x => x.Value == CV.ContentType).Key); //Patient.firstName + "_" + Patient.lastName + "_" + i + ".txt"
+                        var filePath = Path.Combine(_filePath + "/" + model.Id + "_" + model.firstName + "_" + model.lastName, model.firstName + "_" + model.lastName + "_CV" + fileTypes.FirstOrDefault(x => x.Value == CV.ContentType).Key); //Patient.firstName + "_" + Patient.lastName + "_" + i + ".txt"
                         using (var stream = System.IO.File.Create(filePath))
                         {
                             await CV.CopyToAsync(stream);
                             System.Diagnostics.Debug.WriteLine("Saved CV");
-                            ok += 1;
                         }
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("Invalid file type for CV : " + CV.ContentType);
+                        _context.Enroll.Remove(model);
+                        Directory.Delete(_filePath + "/" + model.Id + "_" + model.firstName + "_" + model.lastName, true);
+                        await _context.SaveChangesAsync();
+                        TempData["enrollResult"] = "Sorry, the filetype of your CV does not match the supported types(.doc .docx .pdf)";
+                        return View("Enroll");
+                        //System.Diagnostics.Debug.WriteLine("Invalid file type for CV : " + CV.ContentType);
                     }
                     if (Letter.Length > 0 && fileTypes.FirstOrDefault(x => x.Value == Letter.ContentType).Key != null)
                     {
@@ -174,31 +197,36 @@ namespace VirusTracker.Controllers
                         {
                             await Letter.CopyToAsync(stream);
                             System.Diagnostics.Debug.WriteLine("Saved Letter");
-                            ok += 1;
                         }
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("Invalid file type for Letter : " + CV.ContentType);
-                    }
-
-                    if (ok != 2)
-                    {
                         _context.Enroll.Remove(model);
                         Directory.Delete(_filePath + "/" + model.Id + "_" + model.firstName + "_" + model.lastName, true);
                         await _context.SaveChangesAsync();
-                    } 
+                        TempData["enrollResult"] = "Sorry, the filetype of your Letter does not match the supported types(.doc .docx .pdf)";
+                        return View("Enroll");
+
+                        //  System.Diagnostics.Debug.WriteLine("Invalid file type for Letter : " + CV.ContentType);
+                    }
+
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Doctor already enrolled!");
+                    TempData["enrollResult"] = "This doctor has already enrolled";
+                    return View("Enroll");
+
+                    // System.Diagnostics.Debug.WriteLine("Doctor already enrolled!");
                 }
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Size too big");
+                TempData["enrollResult"] = "The size of the files is too big";
+                return View("Enroll");
+
+                //System.Diagnostics.Debug.WriteLine("Size too big");
             }
-    
+            TempData["enrollResult"] = "success";
             return RedirectToAction("Enroll");
         }
 

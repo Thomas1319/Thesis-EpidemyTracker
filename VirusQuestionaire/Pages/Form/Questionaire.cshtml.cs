@@ -44,15 +44,19 @@ namespace VirusQuestionaire.Pages
         {
             if (!ModelState.IsValid)
             {
-                System.Diagnostics.Debug.WriteLine("Wrong state");
+                TempData["formResult"] = "The data that you submited is invalid, please revise";
                 return Page();
             }
+            if(_context.Patient.First(p => p.emailAddress == Patient.emailAddress) != null)
+            {
+                TempData["formResult"] = "This email address is already in use!";
+                return Page();
 
+            }
             var symptoms = Request.Form["symptom"];
             var extras = Request.Form["extra"];
             List<Tuple<string, string>> list = new List<Tuple<string, string>>();
             string symptomsString = "";
-            System.Diagnostics.Debug.WriteLine("I AM HERE");
             for(int j = 0; j < symptoms.Count; j++)
             {
                 Tuple<string, string> tuple = new Tuple<string, string>(symptoms[j], extras[j]);
@@ -62,56 +66,78 @@ namespace VirusQuestionaire.Pages
             {
                 symptomsString += s.Item1 + ":" + s.Item2 + ",";
             }
-            symptomsString = symptomsString.Substring(0, symptomsString.Length - 2); //remove trailing ","
-            Patient.firstName = Patient.firstName.Trim(); //TRIMMED
-            Patient.lastName = Patient.lastName.Trim(); // TRIMMED
-            Patient.symptoms = symptomsString;
-            System.Diagnostics.Debug.WriteLine(Patient.symptoms.ToString());
-            Patient.quarantineEndDate = Convert.ToDateTime("13/02/1999 00:00:00");
-            _context.Patient.Add(Patient);
-            await _context.SaveChangesAsync();
-            long size = files.Sum(f => f.Length);
-            System.Diagnostics.Debug.WriteLine(size.ToString() + " " + _sizeLimit.ToString());
-            int i = 0;
-            if (size <= _sizeLimit)
+            if(symptomsString.Length > 0)
             {
-                if (!Directory.Exists(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName))
+                symptomsString = symptomsString.Substring(0, symptomsString.Length - 2); //remove trailing ","
+                Patient.firstName = Patient.firstName.Trim(); //TRIMMED
+                Patient.lastName = Patient.lastName.Trim(); // TRIMMED
+                Patient.symptoms = symptomsString;
+                System.Diagnostics.Debug.WriteLine(Patient.symptoms.ToString());
+                Patient.quarantineEndDate = Convert.ToDateTime("13/02/1999 00:00:00");
+                _context.Patient.Add(Patient);
+                await _context.SaveChangesAsync();
+                long size = files.Sum(f => f.Length);
+                System.Diagnostics.Debug.WriteLine(size.ToString() + " " + _sizeLimit.ToString());
+                int i = 0;
+                if(size == 0)
                 {
-                    var ok = false;
-                    Directory.CreateDirectory(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName);
-                    foreach (var formFile in files)
+                    TempData["formResult"] = "No files added!";
+                    return Page();
+
+                }
+                if (size <= _sizeLimit)
+                {
+                    if (!Directory.Exists(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName))
                     {
-                        if (formFile.Length > 0 && fileTypes.FirstOrDefault(x => x.Value == formFile.ContentType).Key != null)
+                        var ok = false;
+                        Directory.CreateDirectory(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName);
+                        foreach (var formFile in files)
                         {
-                            var safeFileName = Patient.firstName + "_" + Patient.lastName + "_" + i;
-                            var filePath = Path.Combine(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName, safeFileName + fileTypes.FirstOrDefault(x => x.Value == formFile.ContentType).Key); //Patient.firstName + "_" + Patient.lastName + "_" + i + ".txt"
-                            using (var stream = System.IO.File.Create(filePath))
+                            if (formFile.Length > 0 && fileTypes.FirstOrDefault(x => x.Value == formFile.ContentType).Key != null)
                             {
-                                await formFile.CopyToAsync(stream);
-                                System.Diagnostics.Debug.WriteLine("Saved file");
-                                ok = true;
-                                i++;
+                                var safeFileName = Patient.firstName + "_" + Patient.lastName + "_" + i;
+                                var filePath = Path.Combine(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName, safeFileName + fileTypes.FirstOrDefault(x => x.Value == formFile.ContentType).Key); //Patient.firstName + "_" + Patient.lastName + "_" + i + ".txt"
+                                using (var stream = System.IO.File.Create(filePath))
+                                {
+                                    await formFile.CopyToAsync(stream);
+                                    System.Diagnostics.Debug.WriteLine("Saved file");
+                                    ok = true;
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                TempData["formResult"] = "Invalid file type : " + formFile.ContentType;
+                                return Page();
                             }
                         }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine("Invalid file type : " + formFile.ContentType);
-                        }
+                        if (ok == false)
+                            Directory.Delete(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName);
                     }
-                    if (ok == false)
-                        Directory.Delete(_filePath + "/" + Patient.ID + "_" + Patient.firstName + "_" + Patient.lastName);
-                } else
-                {
-                    System.Diagnostics.Debug.WriteLine("Patient already enrolled!");
+                    else
+                    {
+                        TempData["formResult"] = "Patient already enrolled!";
+                        return Page();
+                    }
+
                 }
-                    
+                else
+                {
+                    TempData["formResult"] = "Size of the files added is too big!";
+                    return Page();
+                }
+                TempData["formResult"] = "success";
+                return RedirectToPage("/Index");
             } else
             {
-                System.Diagnostics.Debug.WriteLine("Size too big");
-            }
-            
+                TempData["formResult"] = "No symptoms selected!";
+                return Page();
 
-            return RedirectToAction("/");
+            }
+
+
+
+
         }
     }
 }

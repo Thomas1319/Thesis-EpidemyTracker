@@ -772,3 +772,4 @@ D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\bin\Debug\netcoreapp3.1\NltkN
 D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\VirusTracker.csproj.CoreCompileInputs.cache
 D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\VirusTracker.MvcApplicationPartsAssemblyInfo.cs
 D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\VirusTracker.MvcApplicationPartsAssemblyInfo.cache
+D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\Razor\Views\Tools\Statistics.cshtml.g.cs

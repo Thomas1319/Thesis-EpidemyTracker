@@ -30,21 +30,20 @@ else if (TempData["addPatientCheck"] == "fail")
     </div>
 }
 <div class="row">
-    @if (searchCheck.Equals("true"))
-    {
-        <div class="input-group col-1">
-            <form asp-action="Index" asp-controller="Dashboard" method="get">
-                <input type="hidden" name="searchString" value="" />
-                <button class="btn btn-info" type="submit"><i class="material-icons">arrow_back</i></button>
-            </form>
-        </div>
+    
 
-    }
+    <div class="input-group col-6">
+        @if (searchCheck.Equals("true"))
+        {
+                <form asp-action="Index" asp-controller="Dashboard" method="get" class="form-inline">
+                    <input type="hidden" name="searchString" value="" />
+                    <button class="btn btn-info mt-4" type="submit"><i class="material-icons">arrow_back</i></button>
+                </form>
 
-    <div class="input-group col-3">
-        <form asp-action="Index" asp-controller="Dashboard" method="get">
+        }
+        <form asp-action="Index" asp-controller="Dashboard" method="get" class="form-inline">
             <input class="form-control" type="text" name="searchString" />
-            <div>
+            <div class="mt-4">
                 <input class="btn btn-info" type="submit" value="Search" />
             </div>
         </form>

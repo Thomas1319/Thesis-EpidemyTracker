@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5E86Z6DJfEUHf2aA19vyMtFu+gqHrXCi1NuO1B0MSItz0FODVXehri7thsXqOHqVkMBXHjqAXunoyPKPFjLbCw==",
+  "dgSpecHash": "PyeKbFomAzCUzLCL1PQEkvCvSnNaAQPpobNl6L5leIH/FRHTyDUT4dTN+8Pbbf9ZHIaEYwcxwygitanQPmBMWw==",
   "success": true,
-  "projectFilePath": "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj",
+  "projectFilePath": "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Thomas\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\Thomas\\.nuget\\packages\\microsoft.aspnetcore.mvc.razor.extensions\\3.1.3\\microsoft.aspnetcore.mvc.razor.extensions.3.1.3.nupkg.sha512",

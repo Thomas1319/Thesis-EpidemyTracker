@@ -3,7 +3,35 @@
     ViewData["Title"] = "Enroll";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<script>
+    $(document).ready(function () {
+        $('#toFade').delay(3000).fadeOut();
+    });
+</script>
+@if (TempData["enrollResult"] != null)
+{
+    if (TempData["enrollResult"].ToString().Contains("success"))
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+            Your enroll success has been sent successfully, please wait to be contacted via the email address that you provided.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger alert-dismissible fade show mt-3" tabindex="-1" role="alert" id="toFade">
+               @TempData["enrollResult"]
+            <hr />
+            Please try again or contact support
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
 
+}
 <h1>Enroll</h1>
 <hr />
 <div class="row">
@@ -31,7 +59,7 @@
             </div>
             <div class="form-group">
                 <label for="Letter" class="control-label">Please add your Motivation letter(pdf/doc/docx)</label>
-                <input name="Letter" type="file"class="form-control" required />
+                <input name="Letter" type="file" class="form-control" required />
             </div>
             <div class="form-group">
                 <input type="submit" value="Enroll" class="btn btn-primary" />

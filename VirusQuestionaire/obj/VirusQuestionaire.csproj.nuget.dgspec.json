@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj": {}
+    "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj": {}
   },
   "projects": {
-    "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj": {
+    "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj",
+        "projectUniqueName": "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj",
         "projectName": "VirusQuestionaire",
-        "projectPath": "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj",
+        "projectPath": "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusQuestionaire\\VirusQuestionaire.csproj",
         "packagesPath": "C:\\Users\\Thomas\\.nuget\\packages\\",
-        "outputPath": "D:\\VS projects\\Visual Studio proj\\Thesis\\VirusQuestionaire\\obj\\",
+        "outputPath": "D:\\VSprojects\\VisualStudioProj\\Thesis\\VirusQuestionaire\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Thomas\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -33,14 +33,14 @@ namespace VirusQuestionaire.Pages
         {
             if (!ModelState.IsValid)
             {
-                System.Diagnostics.Debug.WriteLine("Invalid Model");
+                TempData["contactResult"] = "The data you wrote is invalid, please revise.";
                 return Page();
             }
-
+            TempData["contactResult"] = "Your question has been sent successfully!";
             _context.Message.Add(Message);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("/");
+            return RedirectToPage("/Contact");
         }
     }
 }

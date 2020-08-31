@@ -29,7 +29,7 @@ else if (TempData["requestCheck"] == "fail")
         </button>
     </div>
 }
-<h1>Requests</h1>
+<h3>Requests</h3>
 <table class="table">
     <thead>
         <tr>
@@ -58,7 +58,7 @@ else if (TempData["requestCheck"] == "fail")
                             <a href="@Url.Action("GetDocument", "Admin", new{document = "Letter", id = e.Id})"><i class="material-icons">description</i></a>
                         </td>
                         <td>
-                            <input class="btn btn-danger" type="button" title="Approve" value="Approve" onclick="location.href='@Url.Action("ApproveDoctor", new {id = e.Id })'" />
+                            <input class="btn btn-success" type="button" title="Approve" value="Approve" onclick="location.href='@Url.Action("ApproveDoctor", new {id = e.Id })'" />
                         </td>
                         <td>
                             <input class="btn btn-danger" type="button" title="Deny" value="Deny" onclick="location.href='@Url.Action("DenyDoctor", new { id = e.Id})'" />

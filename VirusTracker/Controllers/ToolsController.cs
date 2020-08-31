@@ -43,6 +43,14 @@ namespace VirusTracker.Controllers
 
         public IActionResult CreatePatient()
         {
+            
+            return View();
+        }
+
+        public IActionResult Statistics()
+        {
+            var allPatients = _dataContext.Patient.ToList();
+            
             return View();
         }
         public async Task<IActionResult> ManageRoles()

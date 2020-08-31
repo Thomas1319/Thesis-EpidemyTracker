@@ -21,22 +21,20 @@
     <div class="bmd-layout-container bmd-drawer-f-l bmd-drawer-overlay">
         <header class="bmd-layout-header">
             <div class="navbar navbar-light bg-faded">
-                <button class="navbar-toggler" type="button" data-toggle="drawer" data-target="#dw-s2">
+                <button class="navbar-toggler mr-auto" type="button" data-toggle="drawer" data-target="#dw-s2">
                     <span class="sr-only">Toggle drawer</span>
                     <i class="material-icons">menu</i>
                 </button>
-                <a href="@Url.Action("Index", "Dashboard")"><h4>Virus Tracker</h4></a>
-                <ul  class="nav navbar-nav">
+                <a href="@Url.Action("Index", "Dashboard")"><h4>Epidemy Tracker</h4></a>
+
+                <ul class="nav ml-auto">
                     <li class="nav-item">
-                        <a href="@Url.Action("Index", "Message", new { doctorId = TempData.Peek("doctorId") as string})">Contact Admin</a>
+                        <a class="nav-link" href="@Url.Action("Index", "Message", new { doctorId = TempData.Peek("doctorId") as string})">Contact Admin</a>
                     </li>
-                </ul>
-                
-                <ul class="nav navbar-nav">
                     <li class="nav-item">
-                        <a href="@Url.Action("LogOut", "Dashboard")">Log out</a>
+                        <a class="nav-link" href="@Url.Action("LogOut", "Dashboard")">Log out</a>
                     </li>
-                    
+
                 </ul>
 
             </div>
@@ -54,7 +52,7 @@
 
         @{
             var docId = TempData.Peek("doctorId") as string;
-         }
+        }
         <div id="dw-s2" class="bmd-layout-drawer bg-faded">
             @await Component.InvokeAsync("PatientsList", new { doctorId = docId });
         </div>
@@ -65,9 +63,15 @@
             </div>
 
         </main>
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2020 - Epidemy Tracker
+            </div>
+        </footer>
     </div>
 
     
+
     <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
     <script>$(document).ready(function () { $('body').bootstrapMaterialDesign(); });</script>
