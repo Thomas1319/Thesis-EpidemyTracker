@@ -61,7 +61,8 @@ namespace VirusTracker.Helpers
             using (var emailClient = new Pop3Client())
             {
                 System.Diagnostics.Debug.WriteLine("0");
-                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, 
+                    X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
                 emailClient.Connect(_emailConfiguration.PopServer, _emailConfiguration.PopPort, true);
                 emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
                 emailClient.Authenticate(_emailConfiguration.PopUsername, _emailConfiguration.PopPassword);
@@ -71,10 +72,6 @@ namespace VirusTracker.Helpers
                 {
                     System.Diagnostics.Debug.WriteLine("2");
                     var msg = emailClient.GetMessage(i);
-                    //foreach(var m in msg.From.Mailboxes.ToList())
-                    //{
-                    //    System.Diagnostics.Debug.WriteLine(m.Address);
-                    //}
                     if (msg.From.Mailboxes.ToList().Find(m => m.Address == patient.emailAddress.Trim()) != null)
                     {
                         System.Diagnostics.Debug.WriteLine("3");
@@ -87,21 +84,9 @@ namespace VirusTracker.Helpers
                         newEmail.date = msg.Date.UtcDateTime;
                         if (msg.Subject!=null)
                             newEmail.subject = msg.Subject;
-                        //System.Diagnostics.Debug.WriteLine(i);
-                        //var emailMessage = new EmailMessage
-                        //{
-                        //    Content = msg.TextBody,
-                        //    Subject = msg.Subject
-                        //};
-                        //emailMessage.ToAddress = new EmailAddress { Name = doctor.firstName + " " + doctor.lastName, Address = "epidemytracker@gmail.com" };
-                        //emailMessage.FromAddress = new EmailAddress { Name = patient.firstName + " " + patient.lastName, Address = patient.emailAddress };
-                        //emails.Add(emailMessage);
                         emails.Add(newEmail);
                         System.Diagnostics.Debug.WriteLine("4");
                         System.Diagnostics.Debug.WriteLine("5");
-                        //_dataContext.Patient.Find(patient).messages += newEmail.Id.ToString() + ",";
-                        //System.Diagnostics.Debug.WriteLine(newEmail.Id.ToString());
-
                         emailClient.DeleteMessage(i);
                     }
                 }
@@ -125,7 +110,8 @@ namespace VirusTracker.Helpers
             {
                
 
-                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) 
+                                                                                                                                                            { return true; };
                 await emailClient.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.SmtpPort);
                 emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
                 await emailClient.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);

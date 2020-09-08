@@ -78,7 +78,16 @@ namespace VirusTracker.Controllers
             var patient = _dataContext.Patient.ToList().Find(p => p.ID.ToString() == patientId);
             var doctor = _userManager.Users.ToList().Find(d => d.Id == patient.doctorId);
             dynamic mydynamic = new ExpandoObject();
-            mydynamic.Doctor = doctor;
+            if (doctor != null)
+            {
+                var doctorCode = _dataContext.Codes.ToList().Find(c => c.doctorId == doctor.Id);
+                mydynamic.Doctor = doctor;
+                mydynamic.Code = doctorCode;
+            } else
+            {
+                mydynamic.Code = null;
+                mydynamic.Doctor = null;
+            }
             mydynamic.Patient = patient;
             return View(mydynamic);
         }
@@ -168,16 +177,26 @@ namespace VirusTracker.Controllers
             var patient = _dataContext.Patient.ToList().Find(p => p.ID.ToString() == formdata["id"]);
             if(patient != null)
             {
-                    patient.firstName = formdata["fname"];
+                patient.firstName = formdata["fname"];
                 patient.lastName = formdata["lname"];
                 patient.address = formdata["address"];
-                patient.age = Int32.Parse(formdata["age"]);
                 patient.emailAddress = formdata["email"];
                 patient.phoneNumber = formdata["phone"];
+
+                patient.contactFirstName = formdata["cfname"];
+                patient.contactLastName = formdata["clname"];
+                patient.contactAddress = formdata["caddress"];
+                patient.contactEmailAddress = formdata["cemail"];
+                patient.contactPhoneNumber = formdata["cphone"];
+
+                patient.age = Int32.Parse(formdata["age"]);
                 patient.weight = Int32.Parse(formdata["weight"]);
                 patient.height = Int32.Parse(formdata["height"]);
                 patient.symptoms = formdata["symptoms"];
                 patient.treatment = formdata["treatment"];
+                patient.treatmentComments = formdata["treatmentComments"];
+
+
                 await _dataContext.SaveChangesAsync();
                 TempData["editPatientCheck"] = patient.firstName + " " + patient.lastName;
             }

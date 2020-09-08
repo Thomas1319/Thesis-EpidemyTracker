@@ -20,13 +20,27 @@ namespace VirusTracker.ViewComponents
         }
         public async Task<IViewComponentResult> InvokeAsync(string doctorId)
         {
-            var patients = _dataContext.Patient.ToList();
-            var myPatients = patients.FindAll(p => p.doctorId == doctorId);
-            foreach (var p in myPatients)
+            var myPatients = _dataContext.Patient.Where(p => p.doctorId == doctorId).ToList();
+            List<Tuple<Patient, double>> patientWithSent = new List<Tuple<Patient, double>>();
+            foreach(var p in myPatients)
             {
-                System.Diagnostics.Debug.WriteLine(p.firstName + " " + p.lastName + " " + p.symptoms);
+                var sent = _dataContext.Sentiment.Where(s => s.patientId == p.ID).ToList();
+
+                if (sent.Count > 0)
+                {
+                    //System.Diagnostics.Debug.WriteLine(sent.sentiment);
+
+                    patientWithSent.Add(new Tuple<Patient, double>(p, sent.LastOrDefault().sentiment));
+                } else
+                {
+                   // System.Diagnostics.Debug.WriteLine("set to 5");
+
+                    patientWithSent.Add(new Tuple<Patient, double>(p, 5.0));
+                }
+
             }
-            return View(myPatients);
+           
+            return View(patientWithSent);
         }
     }
 }

@@ -3,61 +3,176 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutLoggedin.cshtml";
     var modelSave = Model;
+    var files = TempData.Peek("documents").ToString();
+    var filesNb = 0;
+    if(files.Length > 0)
+    {
+        filesNb = Int32.Parse(files);
+    }
 }
-
+    <script>
+        function toggler() {
+            var x = document.getElementById('treatment4');
+            var y = document.getElementById('treatmentCustom');
+            y.style.display = x.checked ? "block" : "none";
+        }
+    </script>
 <!--Patient data section-->
-<div class="card">
-    <h2 class="card-title">@Model.firstName @Model.lastName</h2>
+<div class="card mt-3 mb-3">
+    <div class="card-title text-light bg-primary border-bottom">
+        <h2 class="ml-2 mt-1">@Model.firstName @Model.lastName</h2>
+    </div>
+
     <div class="card-body">
-        <div class="card-group">
-            <ul class="list-group">
-                <li class="list-group-item"><h6>Address:</h6> @Model.address</li>
-                <li class="list-group-item"><h6>Phone Number:</h6> @Model.phoneNumber</li>
-                <li class="list-group-item"><h6>Email:</h6> @Model.emailAddress</li>
-            </ul>
-        </div>
-
-        <div class="card-group">
-            <ul class="list-group">
-                <li class="list-group-item"><h6>Gender:</h6> @Model.gender</li>
-                <li class="list-group-item"><h6>Age:</h6> @Model.age</li>
-                <li class="list-group-item"><h6>Height:</h6> @Model.height</li>
-                <li class="list-group-item"><h6>Weight:</h6> @Model.weight</li>
-                <li class="list-group-item"><h6>Date when synptoms appeared:</h6> @Model.symptomsDate</li>
-                <li class="list-group-item"><h6>Symptoms:</h6> @Model.symptoms</li>
-            </ul>
-        </div>
-
-        <div class="card-group">
-            <p class="list-group-item">@Model.additionalComments</p>
+        <div class="row">
+            <div class="col-6">
+                <div class="row"><h4 class="text-primary">Address:</h4> <h5 class="ml-2 mt-1">@Model.address</h5></div>
+                <div class="row"><h4 class="text-primary">Phone Number:</h4> <h5 class="ml-2 mt-1">@Model.phoneNumber</h5></div>
+                <div class="row"><h4 class="text-primary">Email:</h4> <h5 class="ml-2 mt-1">@Model.emailAddress</h5></div>
+                @if (Model.contactFirstName != null)
+                {
+                    <hr />
+                    <div class="row"><h4 class="text-primary">Contact Name:</h4> <h5 class="ml-2 mt-1">@Model.contactFirstName @Model.contactLastName</h5></div>
+                    <div class="row"><h4 class="text-primary">Contact Address:</h4> <h5 class="ml-2 mt-1">@Model.contactAddress</h5></div>
+                    <div class="row"><h4 class="text-primary">Contact Phone Number:</h4> <h5 class=" ml-2 mt-1">@Model.contactPhoneNumber</h5></div>
+                    <div class="row"><h4 class="text-primary">Contact Email:</h4> <h5 class="ml-2 mt-1">@Model.contactEmailAddress</h5></div>
+                }
+            </div>
+            <div class="col-6 align-self-center">
+                <i class="material-icons text-primary text-center" style="font-size:20vh">place</i>
+            </div>
         </div>
     </div>
-    
+</div>
 
+
+<div class="card mt-3 mb-3">
+    <div class="card-title text-light bg-primary border-bottom">
+        <h2 class="ml-2 mt-1">Medical details</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6">
+                <div class="row"><h4 class="text-primary">Gender:</h4> <h5 class="ml-2 mt-1">@Model.gender</h5></div>
+                <div class="row"><h4 class="text-primary">Age:</h4> <h5 class="ml-2 mt-1">@Model.age</h5></div>
+                <div class="row"><h4 class="text-primary">Height:</h4> <h5 class="ml-2 mt-1">@Model.height</h5></div>
+                <div class="row"><h4 class="text-primary">Weight:</h4> <h5 class="ml-2 mt-1">@Model.weight</h5></div>
+                @if (Model.additionalComments != null)
+                {
+                    <hr />
+                    <h4 class="card-title text-primary">Additional comments</h4>
+                    <h6 class="card-text">@Model.additionalComments</h6>
+                    <hr />
+                }
+            </div>
+            <div class="col-6 align-self-center">
+                <i class="material-icons text-primary text-center" style="font-size:20vh">accessibility_new</i>
+            </div>
+        </div>
+        <div class="row">
+            <h4 class="text-primary">Documents:</h4>
+            <ul class="list-inline">
+                @if (filesNb > 0)
+                {
+                    for (int i = 0; i < filesNb; i++)
+                    {
+                        <li class="list-inline-item">
+                            <a href="@Url.Action("GetDocument", new{number = i, id = Model.ID})"><i class="material-icons ml-2" style="font-size:5vh">description</i></a>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3 mb-3">
+    <div class="card-title text-light bg-primary border-bottom">
+        <h2 class="ml-2 mt-1">Symptoms</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="row"><h3 class="text-primary">Date when first symptoms appeared:</h3> <h5 class="ml-2 mt-1">@Model.symptomsDate</h5></div>
+                <hr />
+                <div class="row">
+                    @{
+                        var splitPastSymptoms = @Model.symptoms.Split(',');
+                        <div class="col-4">
+                            <h4 class="text-primary">Past symptoms:</h4>
+                        </div>
+                        foreach (var s in splitPastSymptoms)
+                        {
+                            var aux = s.Split(':');
+                            <div class="col-4">
+                                <div class="row">
+                                    <h5 class="text-black-50">@aux[0]</h5>
+                                    @if (aux[1] != "")
+                                    {
+                                        <h6>: @aux[1]</h6>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <!--Treatment section-->
-<div>
-    <form asp-action="ProcessPatient">
-        <input type="hidden" asp-for="@Model.ID" value="@modelSave.ID" />
-
-        <div class="form-group mt-2">
-            <input class="form-check" asp-for="@Model.treatment" type="radio" name="treatment" required="true" value="See a general practitioner" id="treatment1" />
-            <label class="form-check-label" for="treatment1">See a general practitioner</label>
-            <input class="form-check" type="radio" name="treatment" value="House quaratine" id="treatment2" />
-            <label class="form-check-label" for="treatment1">House quaratine</label>
-            <input class="form-check" type="radio" name="treatment" value="Hospitalize" id="treatment3" />
-            <label class="form-check-label" for="treatment1">Hospitalize</label>
+<div class="card mt-4">
+    <div class="card-header bg-primary border-bottom">
+        <div class="row">
+            <h4 class="ml-2 text-white">Choose Treatment</h4>
         </div>
-        <div class="form-group">
-            <textarea class="form-control" asp-for="@Model.treatmentComments" id="message" name="treatmentComments" placeholder="Give details about the treatment..." required="true"></textarea>
-        </div>
-        <div class="form-group">
-            <input class="btn btn-primary" type="submit" value="Submit" />
-            <input class="btn btn-danger" type="button" value="Cancel" onclick="@("window.location.href='" + @Url.Action("Index", "Dashboard") + "'");" />
-
-        </div>
-    </form>
-    
+    </div>
+    <div class="card-body">
+        <form asp-action="ProcessPatient">
+            <input type="hidden" asp-for="@Model.ID" value="@modelSave.ID" />
+            <div class="row">
+                <div class="form-group col-4">
+                    <div class="btn btn-success">
+                        <input class="form-check" asp-for="@Model.treatment" type="radio" name="treatment" required="true" value="See a general practitioner" id="treatment1" onclick="toggler();" />
+                        <label class="form-check-label" for="treatment1">See a general practitioner</label>
+                    </div>
+                </div>
+                <div class="form-group col-4">
+                    <div class="btn btn-warning">
+                        <input class="form-check" type="radio" name="treatment" value="House quaratine" id="treatment2" onclick="toggler();" />
+                        <label class="form-check-label" for="treatment2">House quaratine</label>
+                    </div>
+                </div>
+                <div class="form-group col-4">
+                    <div class="btn btn-danger">
+                        <input class="form-check" type="radio" name="treatment" value="Hospitalize" id="treatment3" onclick="toggler();" />
+                        <label class="form-check-label" for="treatment3">Hospitalize</label>
+                    </div>
+                </div>
+                <div class="form-group col-4">
+                    <div class="btn btn-secondary">
+                        <input class="form-check" type="radio" name="treatment" value="Custom" id="treatment4" onclick="toggler();" />
+                        <label class="form-check-label" for="treatment4">Custom treatment</label>
+                    </div>
+                </div>
+                <div class="col-8">
+                    <input style="display:none" class="form-control w-75" type="text" name="treatmentCustom" placeholder="Custom treatment..." id="treatmentCustom" required/>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="form-group col-12 ml-2">
+                    <textarea class="form-control" asp-for="@Model.treatmentComments" id="message" name="treatmentComments" placeholder="Give details about the treatment..." required="true"></textarea>
+                </div>
+            </div>
+            <div class="row no-gutters">
+                <div class="form-group">
+                    <input class="btn btn-primary" type="submit" value="Submit" />
+                    <input class="btn btn-danger" type="button" value="Cancel" onclick="@("window.location.href='" + @Url.Action("Index", "Dashboard") + "'");" />
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 

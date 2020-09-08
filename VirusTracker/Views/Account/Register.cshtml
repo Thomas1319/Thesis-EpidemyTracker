@@ -21,11 +21,11 @@
         </button>
     </div>
 }
-<h1>Register</h1>
+<h1 class="text-primary mt-4">Register</h1>
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Register">
             @if (ViewBag.Message != null)
             {
@@ -72,6 +72,9 @@
                 <input type="submit" value="Register" class="btn btn-primary" />
             </div>
         </form>
+    </div>
+    <div class="col-md-6 align-self-center">
+        <i class="material-icons text-primary text-center" style="font-size:30vh">perm_identity</i>
     </div>
 </div>
 <div class="row">

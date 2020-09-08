@@ -4,25 +4,32 @@
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="card">
-    <div class="card-title"><h3>All roles</h3></div>
+<div class="card mt-4">
+    <div class="card-header bg-primary border-bottom">
+        <div class="row">
+            <h4 class="text-white ml-2">All roles</h4>
+        </div>
+    </div>
     <div class="card-body">
         <table class="table">
             <thead>
-                <tr>
+                <tr class="text-info">
                     <td>First Name</td>
                     <td>Last Name</td>
                     <td>Code</td>
                     <td>Role</td>
                     <td>Change Role</td>
+                    <td></td>
                 </tr>
             </thead>
             <tbody>
                 @{
                     List<Tuple<string, string>> allRoles = Model.Roles;
+                    List<Codes> allCodes = Model.Codes;
                     foreach (Doctor d in Model.Users)
                     {
                         Tuple<string, string> role = null;
+                        Codes code = allCodes.Find(c => c.doctorId == d.Id);
                         foreach (var r in allRoles)
                         {
 
@@ -35,22 +42,23 @@
                         <tr>
                             <td>@d.firstName</td>
                             <td>@d.lastName</td>
-                            <td>ABC123</td>
+                            <td>@code.Code</td>
                             <td>@role.Item2</td>
                             <td>
                                 <form asp-action="SetRole" method="post" class="form-inline">
                                     <input type="hidden" name="id" value="@d.Id" />
-                                    <div class="form-group mb-4 ml-2 mr-1">
-                                        <select class="custom-select" name="role" id="role">
-                                            <option value="DefaultUser">DefaultUser</option>
-                                            <option value="Administrator">Administrator</option>
-                                            <option value="Restricted">Restricted</option>
-                                        </select>
+                                    <div class="row">
+                                        <div class="col-9">
+                                            <select class="custom-select" name="role" id="role">
+                                                <option value="DefaultUser">DefaultUser</option>
+                                                <option value="Administrator">Administrator</option>
+                                                <option value="Restricted">Restricted</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="submit" class="btn btn-success" value="Save" />
+                                        </div>
                                     </div>
-                                    <div class="form-group mt-1">
-                                        <input type="submit" class="btn btn-success" value="Save" />
-                                    </div>
-
                                 </form>
                             </td>
                             <td>

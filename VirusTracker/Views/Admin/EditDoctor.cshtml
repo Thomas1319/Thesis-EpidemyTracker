@@ -33,9 +33,12 @@ else if (TempData["removeDoctorCheck"] == "success")
     </div>
 }
 <div>
-    <div class="card mt-3 mb-3">
-        <h2 class="card-title"> Dr.@Model.Doctor.firstName @Model.Doctor.lastName</h2>
-
+    <div class="card mt-4">
+        <div class="card-header bg-primary border-bottom">
+            <div class="row">
+                <h4 class="ml-2 text-white"> Dr. @Model.Doctor.firstName @Model.Doctor.lastName</h4>
+            </div>
+        </div>
         <div class="card-body">
             <form asp-action="SaveChangesDoctor" method="post">
                 <input type="hidden" name="id" value="@Model.Doctor.Id" />
@@ -68,39 +71,52 @@ else if (TempData["removeDoctorCheck"] == "success")
         </div>
 
     </div>
+    @if (Model.Patients.Count > 0)
+    {
+        <div class="card mt-4">
+            <div class="card-header bg-primary border-bottom">
+                <div class="row">
+                    <h5 class="ml-2 text-white">Doctor's patients</h5>
+                </div>
+            </div> 
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>First name</td>
+                            <td>Last name</td>
+                            <td>Status</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Patient p in Model.Patients)
+                        {
+                            <tr>
+                                <td>@p.firstName</td>
+                                <td>@p.lastName</td>
+                                @if (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
+                                {
+                                    <td class="text-danger">Sick</td>
+                                }
+                                else
+                                {
+                                    <td class="text-success">Healthy</td>
+                                }
+                                <td>
+                                    <input class="btn btn-info" type="button" title="View" value="view" onclick="location.href='@Url.Action("EditPatient", new { patientId = p.ID })'" />
+                                </td>
+                                <td>
+                                    <input class="btn btn-danger" type="button" title="Remove" value="remove" onclick="location.href='@Url.Action("RemoveFromDoctor", new { patientId = p.ID, docId = Model.Doctor.Id })'" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    }
 
-    <table class="table">
-        <thead>
-            <tr>
-                <td>First name</td>
-                <td>Last name</td>
-                <td>Status</td>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Patient p in Model.Patients)
-            {
-                <tr>
-                    <td>@p.firstName</td>
-                    <td>@p.lastName</td>
-                    @if (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
-                    {
-                        <td class="text-danger">Sick</td>
-                    }
-                    else
-                    {
-                        <td class="text-success">Healthy</td>
-                    }
-                    <td>
-                        <input class="btn btn-info" type="button" title="View" value="view" onclick="location.href='@Url.Action("EditPatient", new { patientId = p.ID })'" />
-                    </td>
-                    <td>
-                        <input class="btn btn-danger" type="button" title="Remove" value="remove" onclick="location.href='@Url.Action("RemoveFromDoctor", new { patientId = p.ID, docId = Model.Doctor.Id })'" />
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 
 
 

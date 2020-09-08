@@ -31,7 +31,8 @@ namespace VirusTracker.Controllers
             dynamic mymodel = new ExpandoObject();
             var messages = _dataContext.Message.Where(m => m.doctorId == doctorId).ToList();
             var doctor = _userManager.Users.FirstOrDefault(u => u.Id == doctorId);
-            mymodel.Messages = messages; 
+            TempData["doctorId"] = doctor.Id;
+            mymodel.Messages = messages.OrderByDescending(d => d.timestamp).ToList();
             mymodel.Doctor = doctor; 
             
             return View(mymodel);

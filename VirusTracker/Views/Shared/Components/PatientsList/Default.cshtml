@@ -1,34 +1,63 @@
-﻿@model List<Patient>
+﻿@model List<Tuple<Patient, double>>
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
-    
-        <header>
-            <a class="navbar-brand">My Patients</a>
-        </header>
-        <ul class="list-group">
-            @foreach(var p in Model)
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+        crossorigin="anonymous"></script>
+<header>
+    <a class="navbar-brand">My Patients</a>
+</header>
+<ul class="list-group w-100">
+    @foreach (var p in Model)
+    {
+    <li class="list-group-item w-100">
+        <div class="row">
+            <a href="@Url.Action("Index", "HandlePatient", new { id = p.Item1.ID })">@p.Item1.firstName @p.Item1.lastName</a>
+        </div>
+        <div class="row">
+            @if (!p.Item1.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00") && DateTime.Compare(p.Item1.quarantineEndDate, DateTime.Now) > 0)
             {
-            <li class="list-group-item">
-                <a href="@Url.Action("Index", "HandlePatient", new { id = p.ID })">@p.firstName @p.lastName</a>
-                @if (!p.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00") && DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
+                //System.Diagnostics.Debug.WriteLine(DateTime.Compare(p.quarantineEndDate, DateTime.Now));
+                <p style="color:red">@p.Item1.quarantineEndDate</p>
+            }
+            else
+            {
+                @if (p.Item1.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00"))
                 {
-                    //System.Diagnostics.Debug.WriteLine(DateTime.Compare(p.quarantineEndDate, DateTime.Now));
-                    <p style="color:red">@p.quarantineEndDate</p>
+                    <p style="color:forestgreen">No quarantine</p>
                 }
                 else
                 {
-                    @if (p.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00"))
-                    {
-                        <p style="color:forestgreen">No quarantine</p>
-                    }
-                    else
-                    {
-                        <p style="color:forestgreen">@p.quarantineEndDate</p>
-                    }
-
+                    <p style="color:forestgreen">@p.Item1.quarantineEndDate</p>
                 }
+            }
+        </div>
+        <div class="row">
+            @if (p.Item2 != null)
+            {
+                double sentiment = Math.Floor(p.Item2 * 10);
+                if (sentiment <= 15.0)
+                {
+                    <p class="text-danger">Panic level: @sentiment% </p>
+                }
+                else if (sentiment > 15.0 && sentiment <= 35.0)
+                {
+                    <p class="text-secondary">Panic level: @sentiment% </p>
+                }
+                else if (sentiment > 35.0 && sentiment <= 60.0)
+                {
+                    <p class="text-primary">Panic level: @sentiment% </p>
+                }
+                else if (sentiment > 60.0)
+                {
+                    <p class="text-success">Panic level: @sentiment% </p>
+                }
+            }
+        </div>
 
-            </li>
-            }   
-        </ul>
+
+    </li>
+    }
+</ul>

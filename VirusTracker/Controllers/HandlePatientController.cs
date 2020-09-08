@@ -96,6 +96,7 @@ namespace VirusTracker.Controllers
                     await _dataContext.SaveChangesAsync();
                     _dataContext.Patient.First(p => p.ID == currentPatient.ID).messages += e.Id + ",";
                 }
+                pm.CloseProcess();
                 
             }
             await _dataContext.SaveChangesAsync();
@@ -113,6 +114,8 @@ namespace VirusTracker.Controllers
             var updates = _dataContext.PatientUpdates.Where(u => u.patientId == currentPatient.ID).ToList();
             if (updates.Count > 0)
             {
+                foreach (var u in updates)
+                    System.Diagnostics.Debug.WriteLine(u.currentSymptoms);
                 updates.OrderBy(d => d.timestamp);
                 mymodel.Updates = updates;
                 mymodel.LastUpdate = updates.LastOrDefault();
@@ -341,7 +344,7 @@ namespace VirusTracker.Controllers
             else
             {
                 System.Diagnostics.Debug.WriteLine("File not found");
-                return RedirectToAction("HandlePatient");
+                return RedirectToAction("Index", new { id = id});
             }
         }
     }

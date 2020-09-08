@@ -1,8 +1,95 @@
-﻿
+﻿@model dynamic
 @{
     ViewData["Title"] = "Statistics";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    
 }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
+        integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg=="
+        crossorigin="anonymous"></script>
 
-<h1>Statistics</h1>
+<div class="card mt-4">
+    <div class="card-header bg-primary border-bottom">
+        <div class="row">
+            <h4 class="text-white ml-2">Statistics</h4>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row no-gutters">
+            <form class="form-inline col-12" asp-action="Statistics" method="POST">
+                <div class="row">
+                    <div class="col-2">
+                        <label for="month">Month: </label>
+                        <select id="month" name="month">
+                            <option value="January">Januray</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <label for="week">Week: </label>
+                        <select id="week" name="week">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                            <option value="4">Week 4</option>
+                            <option value="5">Week 5</option>
+                            <option value="0">Whole Month</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <label for="feature">Feature: </label>
+                        <select id="feature" name="feature">
+                            <option value="severe">Sever Symptoms</option>
+                            <option value="serious">Serious Symptoms</option>
+                            <option value="mild">Mild Symptoms</option>
+                            <option value="new cases">New Cases</option>
+                        </select>
+                    </div>
+                    <div class="col-2 ml-4">
+                        <input type="submit" class="btn btn-info" value="Show Graph" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <canvas id="myChart" class="chart"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var data = []
 
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @Model.Labels,
+            datasets: [{
+                label: ' @Model.Title ',
+                data: @Model.Data,
+                backgroundColor: 'rgba(255, 68, 68, 0.4)',
+                strokeColor: 'rgba(153, 40, 40, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>

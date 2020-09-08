@@ -8,6 +8,9 @@ using VirusTracker.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using VirusTracker.Helpers;
+using System.Dynamic;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace VirusTracker.Controllers
 {
@@ -18,35 +21,60 @@ namespace VirusTracker.Controllers
         private readonly UserManager<Doctor> _userManager;
         private readonly SignInManager<Doctor> _signInManager;
         private readonly IEmailConfiguration _emailConfiguration;
-        
+        private Dictionary<string, string> fileTypes;
+        private readonly string docsPath;
+
         public AddPatientController(UserManager<Doctor> userManager, SignInManager<Doctor> signInManager, VirusTrackerContext dataContext, IEmailConfiguration emailConfiguration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _dataContext = dataContext;
             _emailConfiguration = emailConfiguration;
+            fileTypes = new Dictionary<string, string>() {  { ".pdf", "application/pdf" },
+                                                            { ".doc", "application/msword" },
+                                                            { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" } };
+            docsPath = Directory.GetParent(Environment.CurrentDirectory) + "/NewPatients";
         }
         public async Task<IActionResult> Index(string id)
         {
             var doctor = await _userManager.GetUserAsync(User);
             var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == id);
+            var path = Path.Combine(docsPath, currentPatient.ID + "_" + currentPatient.firstName.Trim() + "_" + currentPatient.lastName.Trim());
+
+            int files = 0;
+            try
+            {
+                files = Directory.GetFiles(path).ToList().Count;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("no files");
+            }
+
+            System.Diagnostics.Debug.WriteLine(files);
+
+            TempData["documents"] = files;
             TempData["doctorId"] = doctor.Id;
             //System.Diagnostics.Debug.WriteLine(currentPatient.firstName + "-------------------------");
             return View(currentPatient);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProcessPatient(Patient patient)
+        public async Task<IActionResult> ProcessPatient(Patient patient, IFormCollection data)
         {
             var doctor = await _userManager.GetUserAsync(User);
             System.Diagnostics.Debug.WriteLine(doctor.Id + " " + doctor.UserName);
             var foundPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == patient.ID.ToString());
             if(doctor != null && foundPatient != null)
             {
-                foundPatient.treatment = patient.treatment;
+                if (patient.treatment.Equals("Custom"))
+                    foundPatient.treatment = data["treatmentCustom"];
+                else
+                    foundPatient.treatment = patient.treatment;
                 foundPatient.treatmentComments = patient.treatmentComments;
                 foundPatient.doctorId = doctor.Id.ToString();
-                if (!patient.treatment.Equals("See a general practitioner"))
+
+                if (!patient.treatment.Equals("See a general practitioner") && !patient.treatment.Equals("Custom"))
                     foundPatient.quarantineEndDate = DateTime.Now.AddDays(14);
 
 
@@ -91,6 +119,42 @@ namespace VirusTracker.Controllers
             
        
             return RedirectToAction("Index", "Dashboard");
+        }
+
+        public async Task<IActionResult> GetDocument(string number, string id)
+        {
+            var currentPatient = _dataContext.Patient.First<Patient>(p => p.ID.ToString() == id);
+            var path = Path.Combine(docsPath, currentPatient.ID + "_" + currentPatient.firstName.Trim() + "_" + currentPatient.lastName.Trim());
+            System.Diagnostics.Debug.WriteLine(path);
+            var files = Directory.GetFiles(path).ToList();
+            string toFind = null;
+            foreach (var f in files)
+            {
+                if (f.Contains(currentPatient.firstName.Trim() + "_" + currentPatient.lastName.Trim() + "_" + number))
+                {
+                    toFind = f;
+                    break;
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine(path);
+            System.Diagnostics.Debug.WriteLine(toFind);
+            if (toFind != null)
+            {
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(toFind, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                var contentType = fileTypes.FirstOrDefault(t => t.Key == Path.GetExtension(toFind).ToLowerInvariant()).Value;
+                return File(memory, contentType, Path.GetFileName(toFind));
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("File not found");
+                return RedirectToAction("Index", new { id = id });
+            }
         }
     }
 }

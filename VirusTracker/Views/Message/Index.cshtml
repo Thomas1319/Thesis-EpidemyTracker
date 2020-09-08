@@ -28,62 +28,90 @@ else if (TempData["sendMessageCheck"] == "fail")
         </button>
     </div>
 }
-<div>
-    <h4>Send a message</h4>
-    <form asp-action="SendMessage" method="post">
-        <input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
-        <input type="hidden" name="type" value="internal" />
-        <input type="hidden" name="name" value="@Model.Doctor.firstName @Model.Doctor.lastName" />
-        <input type="hidden" name="email" value="@Model.Doctor.Email" />
-        <input type="hidden" name="date" value="@DateTime.UtcNow" />
-        <div class="form-group">
-            <input type="text" class="form-control" name="subject" placeholder="Subject" required />
+<div class="card mt-4">
+    <div class="card-header bg-primary border-bottom">
+        <div class="row">
+            <h4 class="ml-2 text-white">Send a message</h4>
         </div>
-        <div class="form-group">
-            <textarea class="form-control" name="message" placeholder="Write your message here..." required></textarea>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-8">
+                <form asp-action="SendMessage" method="post">
+                    <input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
+                    <input type="hidden" name="type" value="internal" />
+                    <input type="hidden" name="name" value="@Model.Doctor.firstName @Model.Doctor.lastName" />
+                    <input type="hidden" name="email" value="@Model.Doctor.Email" />
+                    <input type="hidden" name="date" value="@DateTime.UtcNow" />
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="subject" placeholder="Subject" required />
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" name="message" placeholder="Write your message here..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-info" type="submit">Send</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-4 align-self-center">
+                <i class="material-icons text-primary text-center" style="font-size:20vh">email</i>
+            </div>
         </div>
-        <div class="form-group">
-            <button class="btn btn-info" type="submit">Send</button>
-        </div>
+    </div>
+</div>
+    
+@if (Model.Messages.Count != 0)
+{
 
-    </form>
-    @if (Model.Messages.Count != 0)
+    <h4 class="text-info mt-4">Previous messages</h4>
+    @foreach (var m in Model.Messages)
     {
-        <hr />
-
-        <h4>Previous messages</h4>
-        @foreach (var m in Model.Messages)
+    <div class="card mt-4">
+        @if (m.answer != null)
         {
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-group">
-                        <p class="card-title">@m.subject</p>
-                        <p class="card-text">@m.timestamp</p>
-                        @if (m.answer == null)
-                        {
-                            <i class="text-danger material-icons">cancel</i>
-                        }
-                        else
-                        {
-                            <i class="text-success material-icons">check_circle</i>
-                        }
+            <div class="card-header bg-success border-bottom">
+                <div class="row text-white">
+                    <div class="col-2">
+                        <h6 class="mt-1">@m.timestamp</h6>
+                    </div>
+                    <div class="col-10">
+                        <h5>@m.subject</h5>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="card-group">
-                        <p class="card-title">Your message:</p>
-                        <p class="card-text">@m.messageContent</p>
-                    </div>
-                    @if (m.answer != null)
-                    {
-                        <div class="card-group">
-                            <p class="card-title">Answer:</p>
-                            <p class="card-text">@m.answer</p>
-                        </div>
-                    }
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <h6 class="text-info">Message: </h6>
+                    <p class="card-text mb-1 ml-2"><h6>@m.messageContent</h6></p>
+                </div>
+                <hr />
+                <div class="row">
+                    <h6 class="text-info">Answer: </h6>
+                    <p class="card-text mb-1 ml-2"><h6>@m.answer</h6></p>
                 </div>
             </div>
         }
+        else
+        {
+        <div class="card-header bg-warning border-bottom">
+            <div class="row text-white">
+                <div class="col-2">
+                    <h6 class="mt-1">@m.timestamp</h6>
+                </div>
+                <div class="col-10">
+                    <h5>@m.subject</h5>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <h6 class="text-info">Message: </h6>
+                <p class="card-text mb-1 ml-2"><h6>@m.messageContent</h6></p>
+            </div>
+        </div>
+        }
+    </div>
     }
+}
 
-</div>

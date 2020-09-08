@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
 using VirusTracker.Data;
 using VirusTracker.Models;
 
@@ -20,6 +21,9 @@ namespace VirusTracker.Controllers
         private readonly VirusTrackerContext _dataContext;
         private readonly UserManager<Doctor> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly string severeSymptoms = "difficulty breathing,chest pain or pressure,loss of speech or movement";
+        private readonly string seriousSymptoms = "aches and pains,sore throat, diarrhea, conjunctivitis, headache, lack of taste or smell, rashes on skin, discolouration of fingers or toes";
+        private readonly string mildSymptoms = "fever, dry cough,tiredness";
 
         private static Random random = new Random();
 
@@ -47,11 +51,159 @@ namespace VirusTracker.Controllers
             return View();
         }
 
-        public IActionResult Statistics()
+        static int getWeekNumber(DateTime date)
         {
-            var allPatients = _dataContext.Patient.ToList();
+            date = date.Date;
+            DateTime mday = new DateTime(date.Year, date.Month, 1);
+            DateTime mmonth = mday.AddDays((DayOfWeek.Monday + 7 - mday.DayOfWeek) % 7);
+            if(mmonth > date)
+            {
+                mday = mday.AddMonths(-1);
+                mmonth = mday.AddDays((DayOfWeek.Monday + 7 - mday.DayOfWeek) & 7);
+            }
+            return (date - mmonth).Days / 7 + 1;
+        }
+        static bool checkIfContains(string toCheck, string[] elements)
+        {
+            foreach(var e in elements)
+            {
+                if (toCheck.Contains(e) == true)
+                    return true;
+            }
+            return false;
+        }
+        public async Task<IActionResult> Statistics(IFormCollection data)
+        {
+            dynamic mydynamic = new ExpandoObject();
+            Dictionary<int, int> days = new Dictionary<int, int>();
+            string[] features = { "severe", "mild", "serious" };
+            if (String.IsNullOrEmpty(data["feature"]) == false)
+            {
+                if (checkIfContains(data["feature"], features) == true)
+                {
+                    string[] splitSymp = null;
+                    if (data["feature"] == "severe")
+                    {
+                        splitSymp = severeSymptoms.Split(",");
+                    }
+                    else if (data["feature"] == "serious")
+                    {
+                        splitSymp = seriousSymptoms.Split(",");
+                    }
+                    else if (data["feature"] == "mild")
+                    {
+                        splitSymp = mildSymptoms.Split(",");
+                    }
+
+                    var toShow = _dataContext.Patient.ToList().FindAll(p => checkIfContains(p.symptoms, splitSymp) == true);
+                    toShow = toShow.FindAll(p => p.symptomsDate.ToString("MMMM") == data["month"]);
+                    toShow = toShow.OrderBy(p => p.symptomsDate).ToList();
+                    if (data["week"] == "0")
+                    {
+                        foreach (var t in toShow)
+                        {
+                            if (days.ContainsKey(t.symptomsDate.Day))
+                            {
+                                days[t.symptomsDate.Day] += 1;
+                            }
+                            else
+                            {
+                                days[t.symptomsDate.Day] = 1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var t in toShow)
+                        {
+                            if (getWeekNumber(t.symptomsDate).ToString() == data["week"])
+                            {
+                                if (days.ContainsKey(t.symptomsDate.Day))
+                                {
+                                    days[t.symptomsDate.Day] += 1;
+                                }
+                                else
+                                {
+                                    days[t.symptomsDate.Day] = 1;
+                                }
+                            }
+                        }
+
+                    }
+                    List<int> keys = new List<int>();
+                    List<int> values = new List<int>();
+                    foreach (var d in days)
+                    {
+                        keys.Add(d.Key);
+                        values.Add(d.Value);
+                    }
+                    if (keys.Count() <= 0 || values.Count() <= 0)
+                        mydynamic.Title = JsonConvert.SerializeObject("No data has been found for your selection");
+                    else
+                        mydynamic.Title = JsonConvert.SerializeObject(data["feature"] + " in " + data["month"] + ": " + data["week"]);
+                    mydynamic.Labels = JsonConvert.SerializeObject(keys);
+                    mydynamic.Data = JsonConvert.SerializeObject(values);
+                }
+                else
+                {
+                    var toShow = _dataContext.Patient.ToList();
+                    toShow = toShow.FindAll(p => p.symptomsDate.ToString("MMMM") == data["month"]);
+                    toShow = toShow.OrderBy(p => p.symptomsDate).ToList();
+                    if (data["week"] != "0")
+                    {
+                        foreach (var t in toShow)
+                        {
+                            if (getWeekNumber(t.symptomsDate).ToString() == data["week"])
+                            {
+                                if (days.ContainsKey(t.symptomsDate.Day))
+                                {
+                                    days[t.symptomsDate.Day] += 1;
+                                }
+                                else
+                                {
+                                    days[t.symptomsDate.Day] = 1;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var t in toShow)
+                        {
+                            if (days.ContainsKey(t.symptomsDate.Day))
+                            {
+                                days[t.symptomsDate.Day] += 1;
+                            }
+                            else
+                            {
+                                days[t.symptomsDate.Day] = 1;
+                            }
+                        }
+                    }
+
+                    List<int> keys = new List<int>();
+                    List<int> values = new List<int>();
+                    foreach (var d in days)
+                    {
+                        keys.Add(d.Key);
+                        values.Add(d.Value);
+                    }
+                    if(keys.Count() <= 0 || values.Count() <= 0)
+                        mydynamic.Title = JsonConvert.SerializeObject("No data has been found for your selection");
+                    else
+                        mydynamic.Title = JsonConvert.SerializeObject(data["feature"] + " in " + data["month"] + ": " + data["week"]);
+                    mydynamic.Labels = JsonConvert.SerializeObject(keys);
+                    mydynamic.Data = JsonConvert.SerializeObject(values);
+                }
+            }
+            else
+            {
+                mydynamic.Labels = "null";
+                mydynamic.Data = "null";
+                mydynamic.Title = JsonConvert.SerializeObject("No data has been selected yet");
+            }
             
-            return View();
+            return View(mydynamic);
         }
         public async Task<IActionResult> ManageRoles()
         {
@@ -66,6 +218,7 @@ namespace VirusTracker.Controllers
             }
             mymodel.Users = users;
             mymodel.Roles = usersWithRoles;
+            mymodel.Codes = _dataContext.Codes.ToList();
             return View(mymodel);
         }
 
@@ -181,6 +334,8 @@ namespace VirusTracker.Controllers
             await _userManager.AddToRoleAsync(user, role);
             return RedirectToAction("ManageRoles");
         }
+
+        
 
     }
 }

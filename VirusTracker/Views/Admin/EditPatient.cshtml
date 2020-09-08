@@ -38,16 +38,19 @@ else if (TempData["editPatientCheck"] == "fail")
     </div>
 }
 <div>
-    <div class="card mt-3 mb-3">
-        @if (Model.Patient.gender == "Male")
-        {
-            <h2 class="card-title"> Mr. @Model.Patient.firstName @Model.Patient.lastName</h2>
-        }
-        else
-        {
-            <h2 class="card-title"> Ms. @Model.Patient.firstName @Model.Patient.lastName</h2>
-        }
-
+    <div class="card mt-4">
+        <div class="card-header bg-primary border-bottom">
+            <div class="row">
+                @if (Model.Patient.gender == "Male")
+                {
+                    <h4 class="ml-2 text-white"> Mr. @Model.Patient.firstName @Model.Patient.lastName</h4>
+                }
+                else
+                {
+                    <h4 class="ml-2 text-white"> Ms. @Model.Patient.firstName @Model.Patient.lastName</h4>
+                }
+            </div>
+        </div>
         <div class="card-body">
             <form asp-action="SaveChangesPatient" method="post">
                 <input type="hidden" name="id" value="@Model.Patient.ID" />
@@ -64,10 +67,6 @@ else if (TempData["editPatientCheck"] == "fail")
                     <input type="text" id="address" name="address" value="@Model.Patient.address" class="form-control" required />
                 </div>
                 <div class="form-group">
-                    <label for="password">Age:</label>
-                    <input type="text" id="age" name="age" value="@Model.Patient.age" class="form-control" required />
-                </div>
-                <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="text" id="email" name="email" value="@Model.Patient.emailAddress" class="form-control" required />
                 </div>
@@ -75,21 +74,51 @@ else if (TempData["editPatientCheck"] == "fail")
                     <label for="phone">Phone Number:</label>
                     <input type="text" id="phone" name="phone" value="@Model.Patient.phoneNumber" class="form-control" required />
                 </div>
+                <hr />
                 <div class="form-group">
-                    <label for="phone">Weight:</label>
+                    <label for="fname">Contact First Name:</label>
+                    <input type="text" id="cfname" name="cfname" value="@Model.Patient.contactFirstName" class="form-control"  />
+                </div>
+                <div class="form-group">
+                    <label for="lname">Contact Last Name:</label>
+                    <input type="text" id="clname" name="clname" value="@Model.Patient.contactLastName" class="form-control"  />
+                </div>
+                <div class="form-group">
+                    <label for="username">Contact Address:</label>
+                    <input type="text" id="caddress" name="caddress" value="@Model.Patient.contactAddress" class="form-control"  />
+                </div>
+                <div class="form-group">
+                    <label for="email">Contact Email:</label>
+                    <input type="text" id="cemail" name="cemail" value="@Model.Patient.contactEmailAddress" class="form-control"  />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Contact Phone Number:</label>
+                    <input type="text" id="cphone" name="cphone" value="@Model.Patient.contactPhoneNumber" class="form-control"  />
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label for="password">Age:</label>
+                    <input type="text" id="age" name="age" value="@Model.Patient.age" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight:</label>
                     <input type="text" id="weight" name="weight" value="@Model.Patient.weight" class="form-control" required />
                 </div>
                 <div class="form-group">
-                    <label for="phone">Height:</label>
+                    <label for="height">Height:</label>
                     <input type="text" id="height" name="height" value="@Model.Patient.height" class="form-control" required />
                 </div>
                 <div class="form-group">
-                    <label for="phone">Symptoms:</label>
+                    <label for="symptoms">Initial symptoms:</label>
                     <input type="text" id="symptoms" name="symptoms" value="@Model.Patient.symptoms" class="form-control" required />
                 </div>
                 <div class="form-group">
-                    <label for="phone">Treatment:</label>
-                    <input type="text" id="treatment" name="treatment" value="@Model.Patient.treatment" class="form-control" required />
+                    <label for="treatment">Initial Treatment:</label>
+                    <input type="text" id="treatment" name="treatment" value="@Model.Patient.treatment" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="treatment">Initial treatment comments:</label>
+                    <input type="text" id="treatmentComments" name="treatmentComments" value="@Model.Patient.treatmentComments" class="form-control">
                 </div>
                 <input class="btn btn-info" type="submit" title="Edit" value="edit" />
             </form>
@@ -97,32 +126,42 @@ else if (TempData["editPatientCheck"] == "fail")
 
     </div>
 
-    @if (Model.Patient.doctorId != null)
+    @if (Model.Doctor != null)
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Code</th>
-                </tr>
+        <div class="card mt-4">
+            <div class="card-header bg-primary border-bottom">
+                <div class="row">
+                    <h5 class="ml-2 text-white">Supervising doctor</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Code</th>
+                        </tr>
 
-            </thead>
-            <tbody>
-                <tr>
-                    <td>@Model.Doctor.firstName</td>
-                    <td>@Model.Doctor.lastName</td>
-                    <td>ABC123</td>
-                    <td>
-                        <input class="btn btn-info" type="button" title="View" value="View" onclick="location.href='@Url.Action("EditDoctor", new { doctorId = Model.Doctor.Id })'" />
-                    </td>
-                    <td>
-                        <input class="btn btn-danger" type="button" title="Remove" value="Remove" onclick="location.href='@Url.Action("RemoveFromPatient", new { patId = Model.Patient.ID })'" />
-                    </td>
-                </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@Model.Doctor.firstName</td>
+                            <td>@Model.Doctor.lastName</td>
+                            <td>@Model.Code.Code</td>
+                            <td>
+                                <input class="btn btn-info" type="button" title="View" value="View" onclick="location.href='@Url.Action("EditDoctor", new { doctorId = Model.Doctor.Id })'" />
+                            </td>
+                            <td>
+                                <input class="btn btn-danger" type="button" title="Remove" value="Remove" onclick="location.href='@Url.Action("RemoveFromPatient", new { patId = Model.Patient.ID })'" />
+                            </td>
+                        </tr>
 
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
     }
 
 

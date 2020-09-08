@@ -6,13 +6,13 @@
     var modelSave = Model.Patient;
     var searchCheck = TempData.Peek("searchCheck");
 }
-<script>
+    <script>
     //scroll to the DIV the reloaded the page TO DO
     window.onload = function () {
         var obj = document.getElementById("scrollable");
         obj.scrollTop = obj.scrollHeight;
     }
-
+   
     function switchTab(tabId, nextTab) {
         var x = document.getElementById("tab-" + tabId);
         var y = document.getElementById("tab-" + nextTab);
@@ -20,43 +20,57 @@
         y.style.display = "block";
     }
     function createSymptom(index) {
+        var sympDiv = document.createElement("div");
+        sympDiv.setAttribute("class", "col-5");
         var s = document.createElement("input");
         s.setAttribute("type", "text");
         s.setAttribute("class", "form-control");
         s.setAttribute("name", "currSymptom " + index);
-        s.style.width = "40%";
         s.required = true;
+        sympDiv.appendChild(s);
 
+        var arrDiv = document.createElement("div");
+        arrDiv.setAttribute("class", "col-1");
         var i = document.createElement("i");
         i.setAttribute("class", "material-icons");
         i.innerHTML = "keyboard_arrow_right";
+        arrDiv.appendChild(i);
 
+        var sympDiv2 = document.createElement("div");
+        sympDiv2.setAttribute("class", "col-5");
         var s2 = document.createElement("input");
         s2.setAttribute("type", "text");
         s2.setAttribute("class", "form-control");
         s2.setAttribute("name", "currComment " + index);
-        s2.style.width = "40%";
         s2.value = "";
+        sympDiv2.appendChild(s2);
 
+        var btnDiv = document.createElement("div");
+        btnDiv.setAttribute("class", "col-1");
         var btn = document.createElement("button");
         btn.setAttribute("type", "button");
         btn.setAttribute("id", "symptom " + index);
         btn.setAttribute("class", "text-danger btn");
         btn.setAttribute("onclick", "removeSymptom(" + index + "); toggleCreate()");
+        btnDiv.appendChild(btn);
 
         var i2 = document.createElement("i");
         i2.setAttribute("class", "material-icons");
         i2.innerHTML = "remove";
 
         btn.appendChild(i2);
+        var rowDiv = document.createElement("div");
+        rowDiv.setAttribute("class", "row no-gutters");
+
+        rowDiv.appendChild(sympDiv);
+        rowDiv.appendChild(arrDiv);
+        rowDiv.appendChild(sympDiv2);
+        rowDiv.appendChild(btnDiv);
 
         var div = document.createElement("div");
-        div.setAttribute("class", "col-4 form-inline");
+        div.setAttribute("class", "col-6");
         div.setAttribute("id", "symptom " + index);
-        div.appendChild(s);
-        div.appendChild(i);
-        div.appendChild(s2);
-        div.appendChild(btn);
+        div.appendChild(rowDiv);
 
         document.getElementById("symptomsContainer").appendChild(div);
     }
@@ -73,7 +87,7 @@
         else
             x.style.display = "none";
     }
-</script>
+    </script>
 <script>
     $(document).ready(function () {
         $('#toFade').delay(3000).fadeOut();
@@ -184,213 +198,330 @@ else if (TempData["stopQuarantinePatient"] == "fail")
 <!--Patient data section-->
 <div>
     <div class="card mt-3 mb-3">
-        <h2 class="card-title">@Model.Patient.firstName @Model.Patient.lastName</h2>
+        <div class="card-title text-light bg-primary border-bottom">
+            <h2 class="ml-2 mt-1">@Model.Patient.firstName @Model.Patient.lastName</h2>
+        </div>
 
         <div class="card-body">
-            <ul class="list-group">
-                <li class="list-group-item"><h6>Address:</h6> @Model.Patient.address</li>
-                <li class="list-group-item"><h6>Phone Number:</h6> @Model.Patient.phoneNumber</li>
-                <li class="list-group-item"><h6>Email:</h6> @Model.Patient.emailAddress</li>
-            </ul>
+            <div class="row">
+                <div class="col-6">
+                    <div class="row"><h4 class="text-primary">Address:</h4> <h5 class="ml-2 mt-1">@Model.Patient.address</h5></div>
+                    <div class="row"><h4 class="text-primary">Phone Number:</h4> <h5 class="ml-2 mt-1">@Model.Patient.phoneNumber</h5></div>
+                    <div class="row"><h4 class="text-primary">Email:</h4> <h5 class="ml-2 mt-1">@Model.Patient.emailAddress</h5></div>
+                    @if (Model.Patient.contactFirstName != null)
+                    {
+                        <hr />
+                        <div class="row"><h4 class="text-primary">Contact Name:</h4> <h5 class="ml-2 mt-1">@Model.Patient.contactFirstName @Model.Patient.contactLastName</h5></div>
+                        <div class="row"><h4 class="text-primary">Contact Address:</h4> <h5 class="ml-2 mt-1">@Model.Patient.contactAddress</h5></div>
+                        <div class="row"><h4 class="text-primary">Contact Phone Number:</h4> <h5 class=" ml-2 mt-1">@Model.Patient.contactPhoneNumber</h5></div>
+                        <div class="row"><h4 class="text-primary">Contact Email:</h4> <h5 class="ml-2 mt-1">@Model.Patient.contactEmailAddress</h5></div>
+                    }
+                </div>
+                <div class="col-6 align-self-center">
+                    <i class="material-icons text-primary text-center" style="font-size:20vh">place</i>
+                </div>
+            </div>
         </div>
     </div>
 
 
     <div class="card mt-3 mb-3">
-        <h2 class="card-title">Medical Info</h2>
-        <div class="card-body">
-            <ul class="list-group">
-                <li class="list-group-item"><h6>Gender:</h6> @Model.Patient.gender</li>
-                <li class="list-group-item"><h6>Age:</h6> @Model.Patient.age</li>
-                <li class="list-group-item"><h6>Height:</h6> @Model.Patient.height</li>
-                <li class="list-group-item"><h6>Weight:</h6> @Model.Patient.weight</li>
-
-            </ul>
-            <h2 class="card-title">Additional comments</h2>
-
-            <p class="card-text">@Model.Patient.additionalComments</p>
+        <div class="card-title text-light bg-primary border-bottom">
+            <h2 class="ml-2 mt-1">Medical details</h2>
         </div>
-        <ul class="list-inline">
-            @if (Model.Documents > 0)
-            {
-                for (int i = 0; i < Model.Documents; i++)
-                {
-                    <li class="list-inline-item">
-                        <a href="@Url.Action("GetDocument", "HandlePatient", new{number = i, id = Model.Patient.ID})"><i class="material-icons">description</i></a>
-                    </li>
-                }
-            }
-
-
-        </ul>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="row"><h4 class="text-primary">Gender:</h4> <h5 class="ml-2 mt-1">@Model.Patient.gender</h5></div>
+                    <div class="row"><h4 class="text-primary">Age:</h4> <h5 class="ml-2 mt-1">@Model.Patient.age</h5></div>
+                    <div class="row"><h4 class="text-primary">Height:</h4> <h5 class="ml-2 mt-1">@Model.Patient.height</h5></div>
+                    <div class="row"><h4 class="text-primary">Weight:</h4> <h5 class="ml-2 mt-1">@Model.Patient.weight</h5></div>
+                    @if (Model.Patient.additionalComments != null)
+                    {
+                        <hr />
+                        <h4 class="card-title text-primary">Additional comments</h4>
+                        <h6 class="card-text">@Model.Patient.additionalComments</h6>
+                        <hr />
+                    }
+                </div>
+                <div class="col-6 align-self-center">
+                    <i class="material-icons text-primary text-center" style="font-size:20vh">accessibility_new</i>
+                </div>
+            </div>
+            <div class="row">
+                <h4 class="text-primary">Documents:</h4>
+                <ul class="list-inline">
+                    @if (Model.Documents > 0)
+                    {
+                        for (int i = 0; i < Model.Documents; i++)
+                        {
+                            <li class="list-inline-item">
+                                <a href="@Url.Action("GetDocument", new{number = i, id = Model.Patient.ID})"><i class="material-icons ml-2" style="font-size:5vh">description</i></a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+        
     </div>
 
     <div class="card mt-3 mb-3">
-        <h2 class="card-title">Treatment info</h2>
+        <div class="card-title text-light bg-primary border-bottom">
+            <h2 class="ml-2 mt-1">Treatment Info</h2>
+        </div>
         <div class="card-body">
 
             @if (Model.Updates == null)
             {
-                <form asp-action="CreateUpdate" method="post">
-                    <input type="hidden" name="patientId" value="@Model.Patient.ID" />
-                    <input type="hidden" name="timestamp" id="timestamp" value="@DateTime.UtcNow" />
-                    <div class="form-group">
-                        <label for="fname">Treatment:</label>
-                        <input type="text" id="currTreatment" name="currTreatment" value="@Model.Patient.treatment" class="form-control" required />
+            <form asp-action="CreateUpdate" method="post">
+                <div class="row">
+                    <div class="col-6">
+                        <input type="hidden" name="patientId" value="@Model.Patient.ID" />
+                        <input type="hidden" name="timestamp" id="timestamp" value="@DateTime.UtcNow" />
+                        <div class="form-group">
+                            <label for="fname">Treatment:</label>
+                            <input type="text" id="currTreatment" name="currTreatment" value="@Model.Patient.treatment" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="fname">Treatment Comments:</label>
+                            <input type="text" id="currTreatComm" name="currTreatComm" value="@Model.Patient.treatmentComments" class="form-control" required />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="fname">Treatment Comments:</label>
-                        <input type="text" id="currTreatComm" name="currTreatComm" value="@Model.Patient.treatmentComments" class="form-control" required />
+                    <div class="col-6 align-self-center">
+                        <i class="material-icons text-primary text-center" style="font-size:20vh">healing</i>
                     </div>
-                    <div class="form-group">
-                        <label for="fname">Current Symptoms:</label>
-                        @{
-                            var splitSymptoms = Model.Patient.symptoms.Trim().Split(",");
-                            int i = 0;
-                            <input type="hidden" name="nbSymp" id="nbSymp" value="@splitSymptoms.Length" />
-                            <div class="row" id="symptomsContainer">
-                                @for (i = 0; i < splitSymptoms.Length; i++)
-                                {
-                                    var split = splitSymptoms[i].Split(":");
-                                    <div class="col-4" id="symptom @i">
-                                        <div class="form-inline">
-                                            <input type="text" id="currSymptom @i" name="currSymptom @i" value="@split[0]" class="form-control" style="width:40%" required />
-                                            <i class="material-icons">keyboard_arrow_right</i>
-                                            @if (split.Length > 1)
-                                            {
-                                                <input type="text" id="currComment @i" name="currComment @i" value="@splitSymptoms[i].Split(":")[1]" class="form-control" style="width:40%" />
-                                            }
-                                            else
-                                            {
-                                                <input type="text" id="currComment @i" name="currComment @i" value="" class="form-control" style="width:40%" />
-                                            }
-                                            <button type="button" class="text-danger btn" onclick="removeSymptom(@i)"><i class="material-icons">remove</i></button>
-                                        </div>
+                </div>
+                <h4 class="card-title text-primary">Current symptoms:</h4>
+                <div class="row" id="symptomsContainer">
+                    @{
+                        var splitSymptoms = Model.Patient.symptoms.Trim().Split(",");
+                        int i = 0;
+                        <input type="hidden" name="nbSymp" id="nbSymp" value="@splitSymptoms.Length" />
+                        @for (i = 0; i < splitSymptoms.Length; i++)
+                        {
+                            var split = splitSymptoms[i].Split(":");
+                            <div class="col-6" id="symptom @i">
+                                <div class="row no-gutters">
+                                    <div class="col-5">
+                                        <input type="text" id="currSymptom @i" name="currSymptom @i" value="@split[0]" class="form-control" required />
                                     </div>
-                                }
-                                <button type="button" id="extra" class="text-success btn" onclick="createSymptom(@i); toggleCreate()"><i class="material-icons">add</i></button>
-
+                                    <div class="col-1">
+                                        <i class="material-icons">keyboard_arrow_right</i>
+                                    </div>
+                                    <div class="col-5">
+                                        @if (split.Length > 1)
+                                        {
+                                            <input type="text" id="currComment @i" name="currComment @i" value="@splitSymptoms[i].Split(":")[1]" class="form-control" />
+                                        }
+                                        else
+                                        {
+                                            <input type="text" id="currComment @i" name="currComment @i" value="" class="form-control" />
+                                        }
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="button" class="text-danger btn" onclick="removeSymptom(@i)"><i class="material-icons">remove</i></button>
+                                    </div>
+                                </div>
+                                    
                             </div>
-
-
                         }
-                    </div>
-                    <button type="submit" class="btn btn-info">Update</button>
-                </form>
+                        <button type="button" id="extra" class="text-success btn" onclick="createSymptom(@i); toggleCreate()"><i class="material-icons">add</i></button>
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-info">Update</button>
+            </form>
 
 
             }
             else
             {
                 var lastUpdate = Model.LastUpdate;
-                var lastIndex = Model.Updates.Count;
+                var lastIndex = Model.Updates.Count - 1;
                 <div id="tab-@lastIndex" style="display:block">
-                    <button class="btn btn-info" type="button" onclick="switchTab(@lastIndex, @lastIndex-1)"><i class="material-icons">arrow_back</i></button>
+                    <div class="row">
+                        <button class="btn btn-info" type="button" onclick="switchTab(@lastIndex, @lastIndex-1)"><i class="material-icons">arrow_back</i></button>
+                        <h6 class="text-primary mt-2">@lastUpdate.timestamp</h6>
+                    </div>
                     <form asp-action="CreateUpdate" method="post">
-                        <input type="hidden" name="patientId" value="@Model.Patient.ID" />
-                        <input type="hidden" name="timestamp" id="timestamp" value="@DateTime.UtcNow" />
-                        <div class="form-group">
-                            <label for="fname">Treatment:</label>
-                            <input type="text" id="currTreatment" name="currTreatment" value="@lastUpdate.currentTreatment" class="form-control" required />
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="hidden" name="patientId" value="@Model.Patient.ID" />
+                                <input type="hidden" name="timestamp" id="timestamp" value="@DateTime.UtcNow" />
+                                <div class="form-group">
+                                    <label for="fname">Treatment:</label>
+                                    <input type="text" id="currTreatment" name="currTreatment" value="@lastUpdate.currentTreatment" class="form-control" required />
+                                </div>
+                                <div class="form-group">
+                                    <label for="fname">Treatment Comments:</label>
+                                    <input type="text" id="currTreatComm" name="currTreatComm" value="@lastUpdate.currentTreatmentComments" class="form-control" required />
+                                </div>
+                            </div>
+                            <div class="col-6 align-self-center">
+                                <i class="material-icons text-primary text-center" style="font-size:20vh">healing</i>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="fname">Treatment Comments:</label>
-                            <input type="text" id="currTreatComm" name="currTreatComm" value="@lastUpdate.currentTreatmentComments" class="form-control" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="fname">Current Symptoms:</label>
+                               <div class="row" id="symptomsContainer">
                             @{
                                 var splitSymptoms = lastUpdate.currentSymptoms.Trim().Split(",");
                                 int i = 0;
                                 <input type="hidden" name="nbSymp" id="nbSymp" value="@splitSymptoms.Length" />
-                                <div class="row" id="symptomsContainer">
-                                    @for (i = 0; i < splitSymptoms.Length; i++)
-                                    {
-                                        var split = splitSymptoms[i].Split(":");
-                                        <div class="col-4" id="symptom @i">
-                                            <div class="form-inline">
-                                                <input type="text" id="currSymptom @i" name="currSymptom @i" value="@split[0]" class="form-control" style="width:40%" required />
+                                @for (i = 0; i < splitSymptoms.Length; i++)
+                                {
+                                    var split = splitSymptoms[i].Split(":");
+                                    <div class="col-6" id="symptom @i">
+                                        <div class="row no-gutters">
+                                            <div class="col-5">
+                                                <input type="text" id="currSymptom @i" name="currSymptom @i" value="@split[0]" class="form-control" required />
+                                            </div>
+                                            <div class="col-1">
                                                 <i class="material-icons">keyboard_arrow_right</i>
+                                            </div>
+                                            <div class="col-5">
                                                 @if (split.Length > 1)
                                                 {
-                                                    <input type="text" id="currComment @i" name="currComment @i" value="@splitSymptoms[i].Split(":")[1]" class="form-control" style="width:40%" />
+                                                    <input type="text" id="currComment @i" name="currComment @i" value="@split[1]" class="form-control" />
                                                 }
                                                 else
                                                 {
-                                                    <input type="text" id="currComment @i" name="currComment @i" value="" class="form-control" style="width:40%" />
+                                                    <input type="text" id="currComment @i" name="currComment @i" value="" class="form-control" />
                                                 }
                                             </div>
-                                            <button type="button" class="text-danger btn" onclick="removeSymptom(@i)"><i class="material-icons">remove</i></button>
+                                            <div class="col-1">
+                                                <button type="button" class="text-danger btn" onclick="removeSymptom(@i)"><i class="material-icons">remove</i></button>
+                                            </div>
                                         </div>
-                                    }
-                                    <button type="button" id="extra" class="text-success btn" onclick="createSymptom(@i); toggleCreate()"><i class="material-icons">add</i></button>
-                                </div>
 
-
+                                    </div>
+                                }
+                                <button type="button" id="extra" class="text-success btn" onclick="createSymptom(@i); toggleCreate()"><i class="material-icons">add</i></button>
                             }
                         </div>
-                        <button type="submit" class="btn btn-info">Update</button>
+                        <div class="row">
+                            <button type="submit" class="btn btn-info">Update</button>
+                            <button class="btn btn-danger" type="button" onclick="location.href=' @Url.Action("DeleteUpdate", new { id = lastUpdate.Id, patientId = Model.Patient.ID }) '">Remove Update</button>
+
+                        </div>
+                        
                     </form>
-                    <button class="btn btn-danger" type="button" onclick="location.href=' @Url.Action("DeleteUpdate", new { id = lastUpdate.Id, patientId = Model.Patient.ID }) '">Remove Update</button>
 
                 </div>
                 for (int j = 1; j < Model.Updates.Count - 1; j++)
                 {
                     <div id="tab-@j" style="display:none">
-                        <div class="card-group">
+                        <div class="row">
                             <button class="btn btn-info" type="button" onclick="switchTab(@j, @j-1)"><i class="material-icons">arrow_back</i></button>
+                            <h6 class="text-primary mt-2">@Model.Updates[j].timestamp</h6>
                             <button class="btn btn-info" type="button" onclick="switchTab(@j, @j+1)"><i class="material-icons">arrow_forward</i></button>
                         </div>
-                        <div class="card-group">
-                            <div class="card-text">>@Model.Updates[j].timestamp</div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="row"><h4 class="text-primary">Treatment:</h4> <h5 class="ml-2 mt-1">@Model.Updates[j].currentTreatment</h5></div>
+                                <div class="row"><h4 class="text-primary">Comments:</h4> <h5 class="ml-2 mt-1">@Model.Updates[j].currentTreatmentComments</h5></div>
+                            </div>
+                            <div class="col-6 align-self-center">
+                                <i class="material-icons text-primary text-center" style="font-size:20vh">timeline</i>
+                            </div>
                         </div>
-                        <div class="card-group">
-                            <div class="card-text">@Model.Updates[j].currentTreatment</div>
-                            <div class="card-text">@Model.Updates[j].currentTreatmentComments</div>
-                            <div class="card-text">@Model.Updates[j].currentSymptoms</div>
+                        <hr />
+                        <div class="row">
+                            @{
+                                var splitInitialSymptoms = @Model.Updates[j].currentSymptoms.Split(',');
+                                <div class="col-4">
+                                    <h4 class="text-primary">Past symptoms:</h4>
+                                </div>
+                                foreach(var s in splitInitialSymptoms)
+                                {
+                                    var aux = s.Split(':');
+                                    <div class="col-4">
+                                        <div class="row">
+                                            <h5>@aux[0]</h5>
+                                            @if (aux.Length > 1)
+                                            {
+                                                <h6>: @aux[1]</h6>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
 
                         </div>
                         <button class="btn btn-danger" type="button" onclick="location.href=' @Url.Action("DeleteUpdate", new { id = Model.Updates[j].Id, patientId = Model.Patient.ID }) '">Remove Update</button>
-
                     </div>
                 }
-                <div id="tab-0" style="display:none">
-                    <div class="card-group">
-                        <button class="btn btn-info" type="button" onclick="switchTab('0', '1')"><i class="material-icons">arrow_forward</i></button>
+            <div id="tab-0" style="display:none">
+                <div class="row">
+                    <h6 class="text-primary mt-2">@Model.Patient.symptomsDate</h6>
+                    <button class="btn btn-info" type="button" onclick="switchTab('0', '1')"><i class="material-icons">arrow_forward</i></button>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="row"><h4 class="text-primary">Treatment:</h4> <h5 class="ml-2 mt-1">@Model.Patient.treatment</h5></div>
+                        <div class="row"><h4 class="text-primary">Comments:</h4> <h5 class="ml-2 mt-1">@Model.Patient.treatmentComments</h5></div>
                     </div>
-                    <div class="card-group">
-                        <div class="card-text">>@Model.Patient.symptomsDate</div>
-                    </div>
-                    <div class="card-group">
-                        <div class="card-text">@Model.Patient.treatment</div>
-                        <div class="card-text">@Model.Patient.treatmentComments</div>
-                        <div class="card-text">@Model.Patient.symptoms</div>
-
+                    <div class="col-6 align-self-center">
+                        <i class="material-icons text-primary text-center" style="font-size:20vh">timeline</i>
                     </div>
                 </div>
+                <hr />
+                <div class="row">
+                    @{
+                        var splitPastSymptoms = @Model.Patient.symptoms.Split(',');
+                        <div class="col-4">
+                            <h4 class="text-primary">Past symptoms:</h4>
+                        </div>
+                        foreach (var s in splitPastSymptoms)
+                        {
+                            var aux = s.Split(':');
+                            <div class="col-4">
+                                <div class="row">
+                                    <h5 class="text-black-50">@aux[0]</h5>
+                                    @if (aux[1] != "")
+                                    {
+                                        <h6>: @aux[1]</h6>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+            </div>
+        </div>
             }
+            <hr />
 
             @if (!Model.Patient.quarantineEndDate.ToString().Equals("13/02/1999 00:00:00"))
             {
-                <div class="card-text"><h6>Quarantined until:</h6> @Model.Patient.quarantineEndDate</div>
+            <div class="row">
+                <h5 class="mt-2 text-primary">Quarantined until:</h5>
+                <h6 class="mt-2 ml-2 mr-5">@Model.Patient.quarantineEndDate</h6>
                 <form asp-action="StopQuarantine">
                     <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
                     <div>
                         <input class="btn btn-danger list-group-item" type="submit" value="Stop quarantine" />
                     </div>
                 </form>
+            </div>
+                
             }
             else
             {
-                <div class="card-text">Patient did not need quaratine</div>
-                <form asp-action="StartQuarantine">
-                    <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
-                    <div class="form-group">
-                        <label for="date">Select length of quarantine(days):</label>
-                        <input type="number" max="31" min="1" name="days" id="days" class="form-control" />
-                        <input class="btn btn-success list-group-item" type="submit" value="Start quarantine" />
-                    </div>
-                </form>
+                <div class="row">
+                    <h4 class="text-info ml-2">Patient did not need quaratine</h4>
+                </div>
+                <div class="row">
+                    <form asp-action="StartQuarantine" class="form-inline ml-4">
+                        <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
+                        <div class="form-group">
+                            <div class="row">
+                                <label for="date">Select length of quarantine(days):</label>
+                                <input type="number" max="31" min="1" name="days" id="days" class="form-control ml-2 mb-1" />
+                                <input class="btn btn-success list-group-item" type="submit" value="Start quarantine" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
             }
         </div>
     </div>
@@ -399,20 +530,24 @@ else if (TempData["stopQuarantinePatient"] == "fail")
             @if (searchCheck.ToString() == "True")
             {
                 <div class="input-group col-1">
-                    <form asp-action="Index" asp-controller="HandlePatient" method="get">
+                    <form asp-action="Index" asp-controller="HandlePatient" method="get" class="form-inline">
                         <input type="hidden" name="searchString" value="" />
                         <input type="hidden" name="id" value="@modelSave.ID" />
-                        <button class="btn btn-info" type="submit"><i class="material-icons">arrow_back</i></button>
+                        <button class="btn btn-info mt-2" type="submit"><i class="material-icons">arrow_back</i></button>
                     </form>
                 </div>
 
             }
             <div class="input-group col-3">
                 <form class="form-inline" asp-action="Index" asp-controller="HandlePatient" method="get">
-                    <input type="hidden" name="id" value="@modelSave.ID" />
-                    <input class="form-control" type="text" name="searchString" />
-                    <div>
-                        <input class="btn btn-info" type="submit" value="Search" />
+                    <div class="row">
+                        <input type="hidden" name="id" value="@modelSave.ID" />
+                        <div class="col-9">
+                            <input class="form-control mt-1 ml-4" type="text" name="searchString" />
+                        </div>
+                        <div class="col-3">
+                            <input class="btn btn-info mt-2" type="submit" value="Search" />
+                        </div>
                     </div>
                 </form>
             </div>
@@ -427,20 +562,28 @@ else if (TempData["stopQuarantinePatient"] == "fail")
 
                             @foreach (var e in Model.Messages)
                             {
-                                <div class="row">
+                                <div class="row no-gutters">
                                     @if (e.toAddress.Trim() == Model.Patient.emailAddress.Trim())
                                     {
-                                        <div class="col-6"></div>
-                                        <div class="col-6 bg-primary">
+                                        <div class="col-6 align-self-center">
+                                            <p class="text-info float-right mr-1">
+                                                @e.date
+                                            </p>
+                                        </div>
+                                        <div class="col-6 border-bottom border-white bg-primary align-self-center">
                                             <p class="text-white float-right">@e.content</p>
                                         </div>
                                     }
                                     else
                                     {
-                                        <div class="col-6 border-primary">
+                                        <div class="col-6 align-self-center">
                                             <p class="text-primary float-left">@e.content</p>
                                         </div>
-                                        <div class="col-6"></div>
+                                        <div class="col-6 align-self-lg-center">
+                                            <p class="text-info float-left ml-1">
+                                                @e.date
+                                            </p>
+                                        </div>
 
                                     }
                                 </div>
@@ -452,37 +595,48 @@ else if (TempData["stopQuarantinePatient"] == "fail")
                     @if (Model.Sentiment != null)
                     {
                         double sentiment = Math.Floor(Model.Sentiment * 10);
-                        <div class="d-inline">
-                            <p>Patient's unrest level:<p class="text-danger">Panicked</p> <p class="text-secondary">Uneasy</p> <p class="text-primary">Neutral</p> <p class="text-success">Relaxed</p></p>
+                        <div class="row no-gutters">
+                            <div class="col-4">
+                                <h5 class="text-info">Panic level:</h5>
+                            </div>
+                            <div class="col-2">
+                                <h6 class="text-danger">Panicked</h6>
+                            </div>
+                            <div class="col-2">
+                                <h6 class="text-warning">Uneasy</h6>
+                            </div>
+                            <div class="col-2">
+                                <h6 class="text-primary">Neutral</h6>
+                            </div>
+                            <div class="col-2">
+                                <h6 class="text-success">Relaxed</h6>
+                            </div>
                         </div>
-                        <p>@sentiment</p>
-
-                        if (sentiment <= 15.0)
-                        {
+                            @if (sentiment <= 15.0)
+                            {
                             <div class="progress">
                                 <div class="progress-bar bg-danger" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                        }
-                        else if (sentiment > 15.0 && sentiment <= 35.0)
-                        {
+                            }
+                            else if (sentiment > 15.0 && sentiment <= 35.0)
+                            {
                             <div class="progress">
-                                <div class="progress-bar bg-secondary" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-warning" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                        }
-                        else if (sentiment > 35.0 && sentiment <= 60.0)
-                        {
+                            }
+                            else if (sentiment > 35.0 && sentiment <= 60.0)
+                            {
                             <div class="progress">
                                 <div class="progress-bar bg-primary" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                        }
-                        else if (sentiment > 60.0)
-                        {
+                            }
+                            else if (sentiment > 60.0)
+                            {
                             <div class="progress">
                                 <div class="progress-bar bg-success" role="progressbar" style="width:@sentiment%" aria-valuenow="@sentiment" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                        }
+                            }
                     }
-
                     <form asp-action="SendMessage">
                         <input type="hidden" id="patientId" name="patientId" value="@modelSave.ID" />
 
@@ -494,13 +648,9 @@ else if (TempData["stopQuarantinePatient"] == "fail")
                         </div>
                     </form>
                 </div>
-                        </div>
-
-
+            </div>
         </div>
     </div>
-
-
 </div>
 
 
