@@ -47,7 +47,8 @@ namespace VirusQuestionaire.Pages
                 TempData["formResult"] = "The data that you submited is invalid, please revise";
                 return Page();
             }
-            if(_context.Patient.First(p => p.emailAddress == Patient.emailAddress) != null)
+            var found = _context.Patient.Where(p => p.emailAddress == Patient.emailAddress).ToList().FirstOrDefault();
+            if (found != null)
             {
                 TempData["formResult"] = "This email address is already in use!";
                 return Page();
@@ -74,8 +75,7 @@ namespace VirusQuestionaire.Pages
                 Patient.symptoms = symptomsString;
                 System.Diagnostics.Debug.WriteLine(Patient.symptoms.ToString());
                 Patient.quarantineEndDate = Convert.ToDateTime("13/02/1999 00:00:00");
-                _context.Patient.Add(Patient);
-                await _context.SaveChangesAsync();
+                
                 long size = files.Sum(f => f.Length);
                 System.Diagnostics.Debug.WriteLine(size.ToString() + " " + _sizeLimit.ToString());
                 int i = 0;
@@ -126,6 +126,8 @@ namespace VirusQuestionaire.Pages
                     TempData["formResult"] = "Size of the files added is too big!";
                     return Page();
                 }
+                _context.Patient.Add(Patient);
+                await _context.SaveChangesAsync();
                 TempData["formResult"] = "success";
                 return RedirectToPage("/Index");
             } else

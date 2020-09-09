@@ -236,7 +236,7 @@ namespace VirusTracker.Controllers
             update.currentTreatment = data["currTreatment"];
             update.currentTreatmentComments = data["currTreatComm"];
             if(allUpdates.Find(c =>  c.currentSymptoms == update.currentSymptoms
-                                && c.currentTreatment == update.currentTreatment && c.currentTreatmentComments == c.currentTreatmentComments) == null && 
+                                && c.currentTreatment == update.currentTreatment && c.currentTreatmentComments == update.currentTreatmentComments) == null && 
                                 ((update.currentSymptoms == patient.symptoms.Trim()
                                 && update.currentTreatment == patient.treatment.Trim() && update.currentTreatmentComments == patient.treatmentComments.Trim())) == false)
             {

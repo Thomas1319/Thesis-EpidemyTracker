@@ -155,19 +155,17 @@ else if (TempData["messageCheck"] == "fail")
 
 <!--EXTERNAL-->
 <div id="external" style="display:none">
-    <ul class="list-inline">
-        <li class="list-inline-item">
-            <button class="btn btn-info" type="button" onclick="toggle('external','internal')">Show Internal Messages</button>
-        </li>
-        <li class="list-inline-item">
-            <h4>External messages:</h4>
-        </li>
-        
-    </ul>
+    <div class="row no-gutters mt-2">
+        <div class="col-3">
+            <h3 class="text-secondary">External messages</h3>
+        </div>
+        <div class="col-2">
+            <button class="btn btn-info float-left" type="button" onclick="toggle('external','internal')">Show Internal Messages</button>
+        </div>
+    </div>
 
 
     @{
-        <hr />
         var ext = Model.FindAll(m => m.type.Trim() == "external");
         @if (ext.Count > 0)
         {
@@ -175,30 +173,29 @@ else if (TempData["messageCheck"] == "fail")
             var answered = ext.FindAll(m => m.answer != null);
             @if (unanswered.Count > 0)
             {
-                <h2>Unanswered</h2>
+                <h4 class="text-info">Unanswered</h4>
                 foreach (var m in unanswered)
                 {
-
                     <div class="card mb-3">
-                        <div class="card-header">
-                            <div class="card-group">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">@m.timestamp</li>
-                                    <li class="list-inline-item"><strong>@m.subject</strong></li>
-                                </ul>
+                        <div class="card-header bg-primary border-bottom">
+                            <div class="row text-white">
+                                <div class="col-2">
+                                    <h6 class="mt-1">@m.timestamp</h6>
+                                </div>
+                                <div class="col-10">
+                                    <h5>@m.subject</h5>
+                                </div>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="card-group">
-                                <h6>From: </h6>
-                                <p id="sender" class="card-title mb-1 ml-2"><strong>@m.Name</strong></p>
-
+                            <div class="row">
+                                <h6 class="text-info">From: </h6>
+                                <p id="sender" class="card-title mb-1 ml-2">@m.Name</p>
                             </div>
-                            <div class="card-group">
-                                <h6>Message: </h6>
+                            <div class="row">
+                                <h6 class="text-info">Message: </h6>
                                 <p id="msg" class="card-text mb-1 ml-2">@m.messageContent</p>
                             </div>
-                            <hr />
                             <form asp-action="AnswerExternal" asp-controller="Message" method="post">
                                 <input type="hidden" name="messageId" value="@m.ID" />
                                 <div class="form-group">
@@ -215,40 +212,40 @@ else if (TempData["messageCheck"] == "fail")
             }
             else
             {
-                <h5>There are no Unanswered Messages</h5>
+                <h4 class="text-info">There are no Unanswered Messages</h4>
+                <hr />
             }
 
             @if (answered.Count > 0)
             {
-                <hr />
-                <h2>Answered</h2>
+                <h4 class="text-info">Answered</h4>
                 @foreach (var m in answered)
                 {
                     <div class="card mb-3">
-                        <div class="card-header">
-                            <div class="card-group">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><h6>@m.timestamp</h6></li>
-                                    <li class="list-inline-item"><h5><strong>@m.subject</strong></h5></li>
-                                </ul>
+                        <div class="card-header bg-primary border-bottom">
+                            <div class="row text-white">
+                                <div class="col-2">
+                                    <h6 class="mt-1">@m.timestamp</h6>
+                                </div>
+                                <div class="col-10">
+                                    <h5>@m.subject</h5>
+                                </div>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="card-group">
-                                <h6>From: </h6>
-                                <p id="sender" class="card-title mb-1 ml-2" ><strong>@m.Name</strong></p>
-                                
+                            <div class="row">
+                                <h6 class="text-info">From: </h6>
+                                <p id="sender" class="card-title mb-1 ml-2"><strong>@m.Name</strong></p>
                             </div>
-                            <div class="card-group">
-                                <h6>Message: </h6>
-                                <p id="msg" class="card-text mb-1 ml-2" >@m.messageContent</p>
+                            <div class="row">
+                                <h6 class="text-info">Message: </h6>
+                                <p id="msg" class="card-text mb-1 ml-2">@m.messageContent</p>
                             </div>
                             <hr />
-                            <div class="card-group">
-                                <h6>Answer: </h6>
+                            <div class="row">
+                                <h6 class="text-info">Answer: </h6>
                                 <p id="a s" class="card-text mb-1 ml-2">@m.answer</p>
                             </div>
-
                         </div>
                     </div>
                 }
@@ -257,14 +254,12 @@ else if (TempData["messageCheck"] == "fail")
             else
             {
                 <hr />
-                <h5>There are no Answered Messages</h5>
+                <h4 class="text-info">There are no Answered Messages</h4>
             }
         }
         else
         {
-            <h5>There are no External Messages</h5>
+            <h4 class="text-info">There are no External Messages</h4>
         }
-
-
     }
 </div>

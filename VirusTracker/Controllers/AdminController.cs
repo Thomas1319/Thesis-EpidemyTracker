@@ -33,21 +33,61 @@ namespace VirusTracker.Controllers
                                                             { ".doc", "application/msword" },
                                                             { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" } };
         }
-        public IActionResult Index()
+        public IActionResult Index(string searchString)
         {
             var doctors = _userManager.Users.ToList();
             var patients = _dataContext.Patient.ToList();
+            var codes = _dataContext.Codes.Where(c => c.doctorId != null).ToList();
             dynamic mymodel = new ExpandoObject();
-            mymodel.Doctors = doctors;
             mymodel.Patients = patients;
+            mymodel.Codes = codes;
+            /*DataSeeder seeder = new DataSeeder(_dataContext);
+            seeder.Seed(1000);
+            _dataContext.SaveChanges();*/
+
+            List<Doctor> searchResult = new List<Doctor>();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                searchString.ToLower();
+                foreach (var p in doctors)
+                {
+                    if (p.firstName.ToLower().Contains(searchString) || p.lastName.ToLower().Contains(searchString))
+                        searchResult.Add(p);
+                }
+                TempData["searchCheck"] = "true";
+                mymodel.Doctors = searchResult;
+            }
+            else
+            {
+                TempData["searchCheck"] = "false";
+                mymodel.Doctors = doctors;
+
+            }
+
             return View(mymodel);
         }
 
-        public IActionResult Patients()
+        public IActionResult Patients(string searchString)
         {
             var patients = _dataContext.Patient.ToList();
 
-            return View(patients);
+            List<Patient> searchResult = new List<Patient>();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                searchString.ToLower();
+                foreach (var p in patients)
+                {
+                    if (p.firstName.ToLower().Contains(searchString) || p.lastName.ToLower().Contains(searchString))
+                        searchResult.Add(p);
+                }
+                TempData["searchCheck"] = "true";
+                return View(searchResult);
+            }
+            else
+            {
+                TempData["searchCheck"] = "false";
+                return View(patients);
+            }
         }
 
         public IActionResult Messages()

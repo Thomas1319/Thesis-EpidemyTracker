@@ -55,7 +55,7 @@ namespace VirusQuestionaire.Models
         public string gender { get; set; }
         [Required(ErrorMessage = "Field cannot be empty")]
         [Range(0,201, ErrorMessage ="Field accepts values between 0 and 200")]
-        public float weight { get; set; }
+        public int weight { get; set; }
         [Required(ErrorMessage = "Field cannot be empty")]
         [Range(0, 201, ErrorMessage = "Field accepts values between 0 and 200")]
         public int height { get; set; }

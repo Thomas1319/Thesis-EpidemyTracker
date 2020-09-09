@@ -773,3 +773,6 @@ D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\Virus
 D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\VirusTracker.MvcApplicationPartsAssemblyInfo.cs
 D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\VirusTracker.MvcApplicationPartsAssemblyInfo.cache
 D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\obj\Debug\netcoreapp3.1\Razor\Views\Tools\Statistics.cshtml.g.cs
+D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\bin\Debug\netcoreapp3.1\Data\PatientData2.json
+D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\bin\Debug\netcoreapp3.1\Data\PatientData3.json
+D:\VSprojects\VisualStudioProj\Thesis\VirusTracker\bin\Debug\netcoreapp3.1\Data\PatientData4.json

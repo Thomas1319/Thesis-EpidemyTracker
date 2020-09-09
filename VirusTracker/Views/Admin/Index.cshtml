@@ -3,6 +3,8 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
     List<Patient> patients = Model.Patients;
+    var searchCheck = TempData.Peek("searchCheck");
+
 }
 <script>
     $(document).ready(function () {
@@ -33,9 +35,26 @@ else if (TempData["doctorName"] == "fail")
     <div class="card-header bg-primary border-bottom">
         <div class="row">
             <h4 class="text-white ml-2">Doctors</h4>
+            
         </div>
     </div>
     <div class="card-body">
+        <div class="input-group col-6">
+            @if (searchCheck.Equals("true"))
+            {
+                <form asp-action="Index" asp-controller="Admin" method="get" class="form-inline">
+                    <input type="hidden" name="searchString" value="" />
+                    <button class="btn btn-info mt-4" type="submit"><i class="material-icons">arrow_back</i></button>
+                </form>
+
+            }
+            <form asp-action="Index" asp-controller="Admin" method="get" class="form-inline">
+                <input class="form-control" type="text" name="searchString" />
+                <div class="mt-4">
+                    <input class="btn btn-info" type="submit" value="Search" />
+                </div>
+            </form>
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -50,15 +69,17 @@ else if (TempData["doctorName"] == "fail")
             </thead>
             <tbody>
                 @{
+                    List<Codes> codes = Model.Codes;
                     foreach (Doctor d in Model.Doctors)
                     {
                         int nbOfPatients = patients.Count(p => p.doctorId == d.Id);
                         int sick = patients.Count(p => (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0) && p.doctorId == d.Id);
                         int healthy = nbOfPatients - sick;
+                        var code = codes.FirstOrDefault(c => c.doctorId == d.Id);
                         <tr>
                             <td>@Html.DisplayFor(modelItem => d.firstName)</td>
                             <td>@Html.DisplayFor(modelItem => d.lastName)</td>
-                            <td>ABC123</td>
+                            <td>@code.Code</td>
                             <td>@nbOfPatients</td>
                             <td class="text-danger">@sick</td>
                             <td class="text-success">@healthy</td>

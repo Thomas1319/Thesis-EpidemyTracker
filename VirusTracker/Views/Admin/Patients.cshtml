@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var searchCheck = TempData.Peek("searchCheck");
+
 }
 <script>
     $(document).ready(function () {
@@ -33,9 +35,26 @@ else if (TempData["patientName"] == "fail")
     <div class="card-header bg-primary border-bottom">
         <div class="row">
             <h4 class="text-white ml-2">Patients</h4>
+            
         </div>
     </div>
     <div class="card-body">
+        <div class="input-group col-6">
+            @if (searchCheck.Equals("true"))
+            {
+                <form asp-action="Patients" asp-controller="Admin" method="get" class="form-inline">
+                    <input type="hidden" name="searchString" value="" />
+                    <button class="btn btn-info mt-4" type="submit"><i class="material-icons">arrow_back</i></button>
+                </form>
+
+            }
+            <form asp-action="Patients" asp-controller="Admin" method="get" class="form-inline">
+                <input class="form-control" type="text" name="searchString" />
+                <div class="mt-4">
+                    <input class="btn btn-info" type="submit" value="Search" />
+                </div>
+            </form>
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -52,37 +71,37 @@ else if (TempData["patientName"] == "fail")
 
                     foreach (var p in Model)
                     {
-                                <tr>
-                                    <td>@Html.DisplayFor(modelItem => p.firstName)</td>
-                                    <td>@Html.DisplayFor(modelItem => p.lastName)</td>
-                                    <td>@Html.DisplayFor(modelItem => p.gender)</td>
-                                    <td>@Html.DisplayFor(modelItem => p.age)</td>
-                                    @if (p.doctorId == null)
-                                    {
-                                        <td class="text-secondary">Unknown</td>
-                                    }
-                                    else
-                                    {
-                                        if (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
-                                        {
-                                            <td class="text-danger">Sick</td>
-                                        }
-                                        else
-                                        {
-                                            <td class="text-success">Healthy</td>
-                                        }
-                                    }
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => p.firstName)</td>
+                            <td>@Html.DisplayFor(modelItem => p.lastName)</td>
+                            <td>@Html.DisplayFor(modelItem => p.gender)</td>
+                            <td>@Html.DisplayFor(modelItem => p.age)</td>
+                            @if (p.doctorId == null)
+                            {
+                                <td class="text-secondary">Unknown</td>
+                            }
+                            else
+                            {
+                                if (DateTime.Compare(p.quarantineEndDate, DateTime.Parse("13/02/1999")) > 0 || DateTime.Compare(p.quarantineEndDate, DateTime.Now) > 0)
+                                {
+                                    <td class="text-danger">Sick</td>
+                                }
+                                else
+                                {
+                                    <td class="text-success">Healthy</td>
+                                }
+                            }
 
-                                    <td>
-                                        <input class="btn btn-info" type="button" title="Edit" value="Edit" onclick="location.href='@Url.Action("EditPatient", new { patientId = p.ID })'" />
-                                    </td>
-                                    <td>
-                                        <form id="removePatient" asp-action="RemovePatient">
-                                            <input type="hidden" name="patientId" value="@p.ID" />
-                                            <button type="submit" class="btn btn-danger">Remove</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                            <td>
+                                <input class="btn btn-info" type="button" title="Edit" value="Edit" onclick="location.href='@Url.Action("EditPatient", new { patientId = p.ID })'" />
+                            </td>
+                            <td>
+                                <form id="removePatient" asp-action="RemovePatient">
+                                    <input type="hidden" name="patientId" value="@p.ID" />
+                                    <button type="submit" class="btn btn-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
 
                     }
                 }

@@ -23,7 +23,7 @@ namespace VirusTracker.Helpers
             _dataContext = dataContext;
             try
             {
-                filePath = Environment.CurrentDirectory + "/Data/PatientData.json";
+                filePath = Environment.CurrentDirectory + "/Data/PatientData4.json";
             }
             catch (Exception e)
             {
