@@ -68,9 +68,10 @@ else if (TempData["patientName"] == "fail")
             </thead>
             <tbody>
                 @{
-
+                    int i = 0;
                     foreach (var p in Model)
                     {
+                        i += 1;
                         <tr>
                             <td>@Html.DisplayFor(modelItem => p.firstName)</td>
                             <td>@Html.DisplayFor(modelItem => p.lastName)</td>
@@ -102,7 +103,10 @@ else if (TempData["patientName"] == "fail")
                                 </form>
                             </td>
                         </tr>
-
+                        if (i == 100)
+                        {
+                            break;
+                        }
                     }
                 }
             </tbody>

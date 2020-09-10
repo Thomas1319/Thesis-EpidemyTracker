@@ -75,13 +75,16 @@ namespace VirusQuestionaire.Pages
                 Patient.symptoms = symptomsString;
                 System.Diagnostics.Debug.WriteLine(Patient.symptoms.ToString());
                 Patient.quarantineEndDate = Convert.ToDateTime("13/02/1999 00:00:00");
-                
+                _context.Patient.Add(Patient);
+                await _context.SaveChangesAsync();
                 long size = files.Sum(f => f.Length);
                 System.Diagnostics.Debug.WriteLine(size.ToString() + " " + _sizeLimit.ToString());
                 int i = 0;
                 if(size == 0)
                 {
                     TempData["formResult"] = "No files added!";
+                    _context.Patient.Remove(Patient);
+                    await _context.SaveChangesAsync();
                     return Page();
 
                 }
@@ -108,6 +111,8 @@ namespace VirusQuestionaire.Pages
                             else
                             {
                                 TempData["formResult"] = "Invalid file type : " + formFile.ContentType;
+                                _context.Patient.Remove(Patient);
+                                await _context.SaveChangesAsync();
                                 return Page();
                             }
                         }
@@ -117,6 +122,8 @@ namespace VirusQuestionaire.Pages
                     else
                     {
                         TempData["formResult"] = "Patient already enrolled!";
+                        _context.Patient.Remove(Patient);
+                        await _context.SaveChangesAsync();
                         return Page();
                     }
 
@@ -124,15 +131,18 @@ namespace VirusQuestionaire.Pages
                 else
                 {
                     TempData["formResult"] = "Size of the files added is too big!";
+                    _context.Patient.Remove(Patient);
+                    await _context.SaveChangesAsync();
                     return Page();
                 }
-                _context.Patient.Add(Patient);
-                await _context.SaveChangesAsync();
+                
                 TempData["formResult"] = "success";
                 return RedirectToPage("/Index");
             } else
             {
                 TempData["formResult"] = "No symptoms selected!";
+                _context.Patient.Remove(Patient);
+                await _context.SaveChangesAsync();
                 return Page();
 
             }

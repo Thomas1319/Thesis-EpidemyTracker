@@ -78,16 +78,19 @@ else if (TempData["addPatientCheck"] == "fail")
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            var splitSymptoms = item.symptoms.Split(',');
-            List<Tuple<string, string>> tuples = new List<Tuple<string, string>>();
-            foreach (var s in splitSymptoms)
+        @{
+            int i = 0;
+            foreach (var item in Model)
             {
-                var split = s.Split(":");
-                tuples.Add(new Tuple<string, string>(split[0], "something"));
-            }
-            var iSymptom = tuples[tuples.Count - 1].Item1;
+                i += 1;
+                var splitSymptoms = item.symptoms.Split(',');
+                List<Tuple<string, string>> tuples = new List<Tuple<string, string>>();
+                foreach (var s in splitSymptoms)
+                {
+                    var split = s.Split(":");
+                    tuples.Add(new Tuple<string, string>(split[0], "something"));
+                }
+                var iSymptom = tuples[tuples.Count - 1].Item1;
             <tr scope="row">
                 <td>
                     @Html.DisplayFor(modelItem => item.firstName)
@@ -127,6 +130,11 @@ else if (TempData["addPatientCheck"] == "fail")
                     <input class="btn btn-primary" type="button" title="Select" value="Select" onclick="location.href='@Url.Action("Index", "AddPatient", new { id = item.ID })'" />
                 </td>
             </tr>
+                if (i == 100)
+                {
+                    break;
+                }
+            }
         }
     </tbody>
 </table>
