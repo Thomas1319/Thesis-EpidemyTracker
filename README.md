@@ -19,7 +19,7 @@ Get the code by cloning this repository using git
 git clone https://github.com/Thomas1319/Thesis-EpidemyTracker.git
 ```
 
-In order for the app to work, .Net and Python 3 should be installed on your machine together with all the extra libraries found in the ___
+In order for the app to work, .Net and Python 3 should be installed on your machine together with all the extra libraries.
 
 ### Questionnaire
 
